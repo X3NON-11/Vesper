@@ -50,6 +50,12 @@ build CMakeFiles/http-server.dir/src/main.cpp.o: CXX_COMPILER__http-server_unsca
   OBJECT_FILE_DIR = CMakeFiles/http-server.dir/src
   TARGET_SUPPORT_DIR = CMakeFiles/http-server.dir
 
+build CMakeFiles/http-server.dir/src/server.cpp.o: CXX_COMPILER__http-server_unscanned_ /home/xenon/PROJECTS/cpp/http-server/src/server.cpp || cmake_object_order_depends_target_http-server
+  DEP_FILE = CMakeFiles/http-server.dir/src/server.cpp.o.d
+  OBJECT_DIR = CMakeFiles/http-server.dir
+  OBJECT_FILE_DIR = CMakeFiles/http-server.dir/src
+  TARGET_SUPPORT_DIR = CMakeFiles/http-server.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target http-server
@@ -58,7 +64,7 @@ build CMakeFiles/http-server.dir/src/main.cpp.o: CXX_COMPILER__http-server_unsca
 #############################################
 # Link the executable http-server
 
-build http-server: CXX_EXECUTABLE_LINKER__http-server_ CMakeFiles/http-server.dir/src/main.cpp.o
+build http-server: CXX_EXECUTABLE_LINKER__http-server_ CMakeFiles/http-server.dir/src/main.cpp.o CMakeFiles/http-server.dir/src/server.cpp.o
   DEP_FILE = CMakeFiles/http-server.dir/link.d
   LINK_FLAGS = -Wl,--dependency-file=CMakeFiles/http-server.dir/link.d
   OBJECT_DIR = CMakeFiles/http-server.dir
