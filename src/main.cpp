@@ -1,6 +1,9 @@
 #include "include/server.h"
 
 int main() {
-    http::TcpServer server = http::TcpServer("localhost", 8080);
+    // Start the server
+    http::HttpServer server("localhost", 8080);
+    server.run();
+
     return 0;
 }
