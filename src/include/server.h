@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>           // vector... why am I commentig this?
 #include <cstdio>           // sscanf
 #include <thread>           // multithreading for different clients
 #include <iostream>         // idk
@@ -66,6 +67,13 @@ namespace http {
             std::thread serverThread;
             std::function<void(HttpConnection&)> handler;
 
+            struct Endpoints {
+                std::string endpoint;
+                std::string method;
+                std::function<void(HttpConnection&)> handler;
+            };
+            std::vector<Endpoints> allEndpoints;
+
             void onClient(int client) override;
 
         public:
@@ -73,6 +81,7 @@ namespace http {
             ~HttpServer();
             void run();
             void setHandler(std::function<void(HttpConnection&)> h);
+            void createEndpoint(std::string method, std::string endpoint, std::function<void(HttpConnection&)> h);
     };
 }
 

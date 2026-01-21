@@ -106,14 +106,15 @@ namespace http {    // HTTP-SERVER
         }
         
         // Parse http data
-        char method[10], endpoint[256], version[10];
-        if (sscanf(buffer, "%s %s %s", method, endpoint, version) == 3) { // https://cplusplus.com/reference/cstdio/sscanf/
-            log(LogType::Info, "Method: " + std::string(method) + " Endpoint: " + endpoint + " Version: " + version);
-        } else {
+        char method[10], clientEndpoint[256], version[10];
+        if (!sscanf(buffer, "%s %s %s", method, clientEndpoint, version) == 3) { // https://cplusplus.com/reference/cstdio/sscanf/
             log(LogType::Warn, "Failed to parse http request");
         }
 
         HttpConnection connection(client);
+        for (auto endpoint : allEndpoints) 
+            if (endpoint.endpoint == clientEndpoint && endpoint.method == std::string(method)) endpoint.handler(connection);
+        
         if (handler) {
             handler(connection);
         } else { connection.process(); }
@@ -123,6 +124,14 @@ namespace http {    // HTTP-SERVER
     
     void HttpServer::setHandler(std::function<void(HttpConnection&)> h) {
         handler = std::move(h);
+    }
+    
+    void HttpServer::createEndpoint(std::string method, std::string endpoint, std::function<void(HttpConnection&)> h) {
+        Endpoints newEndpoint;
+        newEndpoint.method = method;
+        newEndpoint.endpoint = endpoint;
+        newEndpoint.handler = h;
+        allEndpoints.push_back(newEndpoint);
     }
 }
 
