@@ -132,7 +132,17 @@ namespace http {    // HTTP-SERVER
         newEndpoint.endpoint = endpoint;
         newEndpoint.handler = h;
         allEndpoints.push_back(newEndpoint);
+        log(LogType::Info, "Succesfully created endpoint [" + endpoint + "]");
     }
+
+    // Every Method for http
+    void HttpServer::GET(std::string endpoint, std::function<void(HttpConnection&)> h) { createEndpoint("GET", endpoint, h); }
+    void HttpServer::POST(std::string endpoint, std::function<void(HttpConnection&)> h) { createEndpoint("POST", endpoint, h); }
+    void HttpServer::PUT(std::string endpoint, std::function<void(HttpConnection&)> h) { createEndpoint("PUT", endpoint, h); }
+    void HttpServer::DELETE(std::string endpoint, std::function<void(HttpConnection&)> h) { createEndpoint("DELETE", endpoint, h); }
+    void HttpServer::PATCH(std::string endpoint, std::function<void(HttpConnection&)> h) { createEndpoint("PATCH", endpoint, h); }
+    void HttpServer::OPTIONS(std::string endpoint, std::function<void(HttpConnection&)> h) { createEndpoint("OPTIONS", endpoint, h); }
+    void HttpServer::HEAD(std::string endpoint, std::function<void(HttpConnection&)> h) { createEndpoint("HEAD", endpoint, h); }
 }
 
 namespace http {    // HTTP-CONNECTION responsible for translating abstractions to tcp usable format
@@ -144,7 +154,7 @@ namespace http {    // HTTP-CONNECTION responsible for translating abstractions 
     }
 
     void HttpConnection::sendPlainText(HttpResponse::StatusCodes status, std::string body) {
-        HttpResponse response(status, body);
+        HttpResponse response(status, body, "text/plain");
 
         std::string http = response.toHttpString();
         send(client, http.c_str(), http.size(), 0);
@@ -156,12 +166,37 @@ namespace http {    // HTTP-CONNECTION responsible for translating abstractions 
 }
 
 namespace http {    // HTTP-RESPONSE used to convert http logic to tcp logic
-    HttpResponse::HttpResponse(StatusCodes status, std::string body) : status(status), body(body) {}
+    HttpResponse::HttpResponse(StatusCodes status, std::string body, std::string type) : status(status), body(body) {
+        if (type == "text/plain") {
+            contentType = "Content-Type: text/plain; charset=utf-8";
+        } else if (type == "text/html") {
+            contentType = "Content-Type: text/html; charset=utf-8";
+        } else if (type == "text/css") {
+            contentType = "Content-Type: text/css; charset=utf-8";
+        } else if (type == "application/javascript") {
+            contentType = "Content-Type: application/javascript; charset=utf-8";
+        } else if (type == "application/json") {
+            contentType = "Content-Type: application/json; charset=utf-8";
+        } else if (type == "application/xml") {
+            contentType = "Content-Type: application/xml; charset=utf-8";
+        } else if (type == "image/png") {
+            contentType = "Content-Type: image/png";
+        } else if (type == "image/jpeg") {
+            contentType = "Content-Type: image/jpeg";
+        } else if (type == "image/gif") {
+            contentType = "Content-Type: image/gif";
+        } else if (type == "application/pdf") {
+            contentType = "Content-Type: application/pdf";
+        } else {
+            contentType = "Content-Type: application/octet-stream";
+        }
+    }
 
     std::string HttpResponse::toHttpString() {
         return "HTTP/1.1 " +
             std::to_string(static_cast<int>(status)) + " " +
             statusToString(status) + "\r\n" +
+            contentType +
             "Content-Length: " + std::to_string(body.size()) + "\r\n" +
             "\r\n" +
             body;

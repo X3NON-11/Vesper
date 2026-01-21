@@ -10,7 +10,7 @@ int main() {
     // Start the server
     http::HttpServer server("localhost", 8080);
     server.setHandler(myHandler); // Fallback non existent endpoint & used for endpoint /
-    server.createEndpoint("POST", "/test", testEndpoint);
+    server.GET("/test", testEndpoint);
     server.run();
 }
 

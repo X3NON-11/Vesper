@@ -43,8 +43,9 @@ namespace http {
 
             StatusCodes status;
             std::string body;
+            std::string contentType;
 
-            HttpResponse(StatusCodes status, std::string body);
+            HttpResponse(StatusCodes status, std::string body, std::string type);
             std::string toHttpString();
         private:
             std::string statusToString(StatusCodes status);
@@ -63,6 +64,20 @@ namespace http {
     };
 
     class HttpServer : public TcpServer { // All the abstractions for http
+        public:
+            HttpServer(std::string ipAddress, int port);
+            ~HttpServer();
+            void run();
+            void setHandler(std::function<void(HttpConnection&)> h);
+
+            void GET(std::string endpoint, std::function<void(HttpConnection&)> h);
+            void POST(std::string endpoint, std::function<void(HttpConnection&)> h);
+            void PUT(std::string endpoint, std::function<void(HttpConnection&)> h);
+            void DELETE(std::string endpoint, std::function<void(HttpConnection&)> h);
+            void PATCH(std::string endpoint, std::function<void(HttpConnection&)> h);
+            void OPTIONS(std::string endpoint, std::function<void(HttpConnection&)> h);
+            void HEAD(std::string endpoint, std::function<void(HttpConnection&)> h);
+
         private:
             std::thread serverThread;
             std::function<void(HttpConnection&)> handler;
@@ -75,12 +90,6 @@ namespace http {
             std::vector<Endpoints> allEndpoints;
 
             void onClient(int client) override;
-
-        public:
-            HttpServer(std::string ipAddress, int port);
-            ~HttpServer();
-            void run();
-            void setHandler(std::function<void(HttpConnection&)> h);
             void createEndpoint(std::string method, std::string endpoint, std::function<void(HttpConnection&)> h);
     };
 }
