@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdio>           // sscanf
 #include <thread>           // multithreading for different clients
 #include <iostream>         // idk
 #include <cstring>          // memset

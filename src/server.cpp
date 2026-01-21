@@ -77,6 +77,7 @@ namespace http {    // TCP-SERVER
         log(LogType::Info, "Client accepted");
         HttpConnection connection(client);
         connection.process();
+        close(client);
     }
 }
 
@@ -95,13 +96,27 @@ namespace http {    // HTTP-SERVER
 
     void HttpServer::onClient(int client) {
         log(LogType::Info, "Client accepted");
-        HttpConnection connection(client);
 
+        // Receive data from client
+        const int bufferSize = 1024;
+        char buffer[bufferSize] = {0};
+        int valread = recv(client, buffer, bufferSize - 1, 0);
+        if (valread < 0) {
+            log(LogType::Warn, "Couldn't receive client data");
+        }
+        
+        // Parse http data
+        char method[10], endpoint[256], version[10];
+        if (sscanf(buffer, "%s %s %s", method, endpoint, version) == 3) { // https://cplusplus.com/reference/cstdio/sscanf/
+            log(LogType::Info, "Method: " + std::string(method) + " Endpoint: " + endpoint + " Version: " + version);
+        } else {
+            log(LogType::Warn, "Failed to parse http request");
+        }
+
+        HttpConnection connection(client);
         if (handler) {
             handler(connection);
-        } else {
-            connection.process();
-        }
+        } else { connection.process(); }
 
         close(client);
     }
@@ -120,11 +135,6 @@ namespace http {    // HTTP-CONNECTION responsible for translating abstractions 
     }
 
     void HttpConnection::sendPlainText(HttpResponse::StatusCodes status, std::string body) {
-        char buffer[4096];
-        ssize_t bytes = recv(client, buffer, sizeof(buffer), 0);
-
-        if (bytes <= 0) return;
-
         HttpResponse response(status, body);
 
         std::string http = response.toHttpString();
