@@ -11,7 +11,7 @@
 #include <arpa/inet.h>      // htons, inet_aton
 #include <functional>       // std::function
 
-#include "logging.h"
+#include "logging.h"        // My own logging library/header
 
 namespace http {
     class TcpServer { // The foundation of the program
@@ -61,13 +61,14 @@ namespace http {
 
         public:
             explicit HttpConnection(int client);
-            void process();
+            void sendErrorNoHandler();
             void sendBuffer(); // Sends all cashed responses together
             void sendBuffer(std::string type, HttpResponse::StatusCodes status);
 
             void sendPlainText(HttpResponse::StatusCodes status, std::string body);
             void sendPlainText(std::string body); // Default status: 200
             void data(std::string type, HttpResponse::StatusCodes status, std::string body);
+            void data(std::string type, std::string body);
     };
 
     class HttpServer : public TcpServer { // All the abstractions for http
@@ -101,7 +102,16 @@ namespace http {
     };
 }
 
-/*
+// So you can write Status::OK instead of this
+using Status = http::HttpResponse::StatusCodes;
+
+/* 
+    ##### Inspiration #####
+
+    https://github.com/bozkurthan/Simple-TCP-Server-Client-CPP-Example/blob/master/tcp-Server.cpp
+    https://www.geeksforgeeks.org/c/tcp-server-client-implementation-in-c/
+    https://man7.org/linux/man-pages/man2/bind.2.html etc.
+
     ##### Logic-Roadmap #####
 
     1. HttpServer creates a TcpServer object

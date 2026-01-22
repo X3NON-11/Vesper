@@ -1,4 +1,4 @@
-#include "include/server.h"
+#include "http-server.h"
 
 // ====================
 // All functions
@@ -20,8 +20,8 @@ void myHandler(http::HttpConnection& conn) {
 }
 
 void testEndpoint(http::HttpConnection& conn) {
-//    conn.sendPlainText("Test1\n");
-//    conn.sendPlainText("Test2\n");
+    // conn.sendPlainText("Test1\n");
+    // conn.sendPlainText("Test2\n");
 
-    conn.data("application/json", http::HttpResponse::StatusCodes::OK, "{\n Test,\n Message \n}");
+    conn.data("application/json", Status::OK, "{\n Test,\n Message \n}");
 }

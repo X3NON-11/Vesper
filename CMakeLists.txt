@@ -3,5 +3,7 @@ project(http-server)
 
 add_executable(http-server 
     src/main.cpp
-    src/server.cpp
+    src/HttpConnection.cpp
+    src/HttpServer.cpp
+    src/TcpServer.cpp
 )
