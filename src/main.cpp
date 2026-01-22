@@ -11,7 +11,7 @@ int main() {
     http::HttpServer server("localhost", 8080);
 
     // Route handlers
-    server.setHandler(myHandler);       // Default handler for /
+    server.setHandler(myHandler);       // Default handler for / & fallback
     server.GET("/test", testEndpoint);  // JSON endpoint
 
     server.run();
@@ -39,7 +39,7 @@ void myHandler(http::HttpConnection& conn) {
         </html>
     )";
 
-    conn.data("text/html", Status::OK, html); // Using conn.data as you wrote
+    conn.data("text/html", Status::OK, html);
 }
 
 // Test endpoint: return JSON
@@ -51,5 +51,5 @@ void testEndpoint(http::HttpConnection& conn) {
         }
     )";
 
-    conn.data("application/json", Status::OK, json); // Using conn.data as in your example
+    conn.data("application/json", Status::OK, json);
 }
