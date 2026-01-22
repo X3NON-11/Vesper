@@ -55,12 +55,19 @@ namespace http {
         private:
             int client;
 
+            HttpResponse::StatusCodes status;
+            std::string bodyBuffer;
+            std::string type;
+
         public:
             explicit HttpConnection(int client);
             void process();
+            void sendBuffer(); // Sends all cashed responses together
+            void sendBuffer(std::string type, HttpResponse::StatusCodes status);
 
             void sendPlainText(HttpResponse::StatusCodes status, std::string body);
             void sendPlainText(std::string body); // Default status: 200
+            void data(std::string type, HttpResponse::StatusCodes status, std::string body);
     };
 
     class HttpServer : public TcpServer { // All the abstractions for http

@@ -112,13 +112,20 @@ namespace http {    // HTTP-SERVER
         }
 
         HttpConnection connection(client);
-        for (auto endpoint : allEndpoints) 
-            if (endpoint.endpoint == clientEndpoint && endpoint.method == std::string(method)) endpoint.handler(connection);
-        
-        if (handler) {
-            handler(connection);
-        } else { connection.process(); }
+        bool handled = false;
 
+        for (auto endpoint : allEndpoints) {
+            if (endpoint.endpoint == clientEndpoint &&
+                endpoint.method == std::string(method)) {
+                endpoint.handler(connection);
+                handled = true;
+                break;
+            }
+        }
+
+        if (!handled) handler ? handler(connection) : connection.process();
+
+        connection.sendBuffer();
         close(client);
     }
     
@@ -154,14 +161,29 @@ namespace http {    // HTTP-CONNECTION responsible for translating abstractions 
     }
 
     void HttpConnection::sendPlainText(HttpResponse::StatusCodes status, std::string body) {
-        HttpResponse response(status, body, "text/plain");
-
-        std::string http = response.toHttpString();
-        send(client, http.c_str(), http.size(), 0);
+        bodyBuffer += body;
+        type = "text/plain";
     }
 
     void HttpConnection::sendPlainText(std::string body) {
         sendPlainText(HttpResponse::StatusCodes::OK, body);
+    }
+
+    void HttpConnection::data(std::string type, HttpResponse::StatusCodes status, std::string body) {
+        bodyBuffer += body;
+        this->type = type;
+        this->status = status;
+    }
+
+    void HttpConnection::sendBuffer(std::string type, HttpResponse::StatusCodes status) {
+        HttpResponse response(status, bodyBuffer, type);
+        std::string http = response.toHttpString();
+
+        send(client, http.c_str(), http.size(), 0);
+    }
+
+    void HttpConnection::sendBuffer() {
+        sendBuffer(type, status);
     }
 }
 
@@ -196,7 +218,7 @@ namespace http {    // HTTP-RESPONSE used to convert http logic to tcp logic
         return "HTTP/1.1 " +
             std::to_string(static_cast<int>(status)) + " " +
             statusToString(status) + "\r\n" +
-            contentType +
+            contentType + "\r\n" +
             "Content-Length: " + std::to_string(body.size()) + "\r\n" +
             "\r\n" +
             body;
