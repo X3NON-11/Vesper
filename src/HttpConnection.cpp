@@ -55,25 +55,36 @@ namespace http {    // HTTP-CONNECTION responsible for translating abstractions 
     HttpConnection::HttpConnection(int client) : client(client) {}
 
     void HttpConnection::sendErrorNoHandler() {
-        sendPlainText(HttpResponse::StatusCodes::INTERNAL_SERVER_ERROR, "No handler parsed");
+        string(HttpResponse::StatusCodes::INTERNAL_SERVER_ERROR, "No handler parsed");
         log(LogType::Warn, "No handler parsed");
     }
 
-    void HttpConnection::sendPlainText(HttpResponse::StatusCodes status, std::string body) {
+    void HttpConnection::string(HttpResponse::StatusCodes status, std::string body) {
         bodyBuffer += body;
         type = "text/plain";
     }
+    void HttpConnection::string(std::string body) {
+        string(HttpResponse::StatusCodes::OK, body);
+    }
 
-    void HttpConnection::sendPlainText(std::string body) {
-        sendPlainText(HttpResponse::StatusCodes::OK, body);
+    void HttpConnection::json(HttpResponse::StatusCodes status, std::string jsonBody) {
+        bodyBuffer += jsonBody;
+        type = "application/json";
+        responseStatus = status;
+    }
+    void HttpConnection::json(std::string jsonBody) {
+        json(HttpResponse::StatusCodes::OK, jsonBody);
+    }
+
+    void HttpConnection::status(HttpResponse::StatusCodes status) {
+        responseStatus = status;
     }
 
     void HttpConnection::data(std::string type, HttpResponse::StatusCodes status, std::string body) {
         bodyBuffer += body;
         this->type = type;
-        this->status = status;
+        responseStatus = status;
     }
-
     void HttpConnection::data(std::string type, std::string body) {
         data(type, HttpResponse::StatusCodes::OK, body);
     }
@@ -86,6 +97,6 @@ namespace http {    // HTTP-CONNECTION responsible for translating abstractions 
     }
 
     void HttpConnection::sendBuffer() {
-        sendBuffer(type, status);
+        sendBuffer(type, responseStatus);
     }
 }

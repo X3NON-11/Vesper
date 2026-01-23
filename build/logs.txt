@@ -1,0 +1,8 @@
+ [INFO] Starting Server
+ [INFO] Initialize socket
+ [INFO] Enable socket reuse
+ [INFO] Bind socket to ip-address
+ [INFO] Listen on socket
+ [INFO] Succesfully created endpoint [/]
+ [INFO] Succesfully created endpoint [/test]
+ [INFO] Accept client

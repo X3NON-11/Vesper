@@ -55,7 +55,7 @@ namespace http {
         private:
             int client;
 
-            HttpResponse::StatusCodes status;
+            HttpResponse::StatusCodes responseStatus;
             std::string bodyBuffer;
             std::string type;
 
@@ -65,8 +65,12 @@ namespace http {
             void sendBuffer(); // Sends all cashed responses together
             void sendBuffer(std::string type, HttpResponse::StatusCodes status);
 
-            void sendPlainText(HttpResponse::StatusCodes status, std::string body);
-            void sendPlainText(std::string body); // Default status: 200
+            void string(HttpResponse::StatusCodes status, std::string body);
+            void string(std::string body); // Default status: 200
+            void json(HttpResponse::StatusCodes status, std::string jsonBody);
+            void json(std::string jsonBody); // Default status: 200
+            void status(HttpResponse::StatusCodes status);
+
             void data(std::string type, HttpResponse::StatusCodes status, std::string body);
             void data(std::string type, std::string body);
     };
@@ -76,7 +80,6 @@ namespace http {
             HttpServer(std::string ipAddress, int port);
             ~HttpServer();
             void run();
-            void setHandler(std::function<void(HttpConnection&)> h);
 
             void GET(std::string endpoint, std::function<void(HttpConnection&)> h);
             void POST(std::string endpoint, std::function<void(HttpConnection&)> h);
@@ -88,7 +91,6 @@ namespace http {
 
         private:
             std::thread serverThread;
-            std::function<void(HttpConnection&)> handler;
 
             struct Endpoints {
                 std::string endpoint;

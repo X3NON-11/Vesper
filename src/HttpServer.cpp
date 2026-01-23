@@ -14,8 +14,6 @@ namespace http {    // HTTP-SERVER
     }
 
     void HttpServer::onClient(int client) {
-        log(LogType::Info, "Client accepted");
-
         // Receive data from client
         const int bufferSize = 1024;
         char buffer[bufferSize] = {0};
@@ -26,30 +24,34 @@ namespace http {    // HTTP-SERVER
         
         // Parse http data
         char method[10], clientEndpoint[256], version[10];
-        if (!sscanf(buffer, "%s %s %s", method, clientEndpoint, version) == 3) { // https://cplusplus.com/reference/cstdio/sscanf/
+        if (sscanf(buffer, "%s %s %s", method, clientEndpoint, version) != 3) { // https://cplusplus.com/reference/cstdio/sscanf/
             log(LogType::Warn, "Failed to parse http request");
+        }
+
+        if (strcmp(clientEndpoint, "/favicon.ico") == 0) {
+            log(LogType::Info, "Ignoring favicon request");
+            close(client);
+            return;
         }
 
         HttpConnection connection(client);
         bool handled = false;
 
         for (auto endpoint : allEndpoints) {
-            if (endpoint.endpoint == clientEndpoint &&
-                endpoint.method == std::string(method)) {
+            if (endpoint.endpoint == clientEndpoint && endpoint.method == std::string(method)) {
                 endpoint.handler(connection);
                 handled = true;
                 break;
             }
         }
 
-        if (!handled) handler ? handler(connection) : connection.sendErrorNoHandler();
+        if (!handled) connection.sendErrorNoHandler();
 
         connection.sendBuffer();
         close(client);
-    }
-    
-    void HttpServer::setHandler(std::function<void(HttpConnection&)> h) {
-        handler = std::move(h);
+
+        // On the bottom so favicon.ico is skipped
+        log(LogType::Info, "Client accepted");
     }
     
     void HttpServer::createEndpoint(std::string method, std::string endpoint, std::function<void(HttpConnection&)> h) {

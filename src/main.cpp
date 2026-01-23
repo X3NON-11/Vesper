@@ -3,22 +3,25 @@
 // ====================
 // All functions
 // ====================
-void myHandler(http::HttpConnection& conn);
-void testEndpoint(http::HttpConnection& conn);
+void myHandler(http::HttpConnection& c);
+void testEndpoint(http::HttpConnection& c);
 
 int main() {
+    debugging = true; // Default on
+    timeDebugging = false; // Default on
+
     // Start the server
     http::HttpServer server("localhost", 8080);
 
     // Route handlers
-    server.setHandler(myHandler);       // Default handler for / & fallback
+    server.GET("/", myHandler);         // Website endpoint
     server.GET("/test", testEndpoint);  // JSON endpoint
 
     server.run();
 }
 
 // Default handler: serve a small HTML page
-void myHandler(http::HttpConnection& conn) {
+void myHandler(http::HttpConnection& c) {
     const char* html = R"(
         <!DOCTYPE html>
         <html>
@@ -39,11 +42,11 @@ void myHandler(http::HttpConnection& conn) {
         </html>
     )";
 
-    conn.data("text/html", Status::OK, html);
+    c.data("text/html", Status::OK, html);
 }
 
 // Test endpoint: return JSON
-void testEndpoint(http::HttpConnection& conn) {
+void testEndpoint(http::HttpConnection& c) {
     const char* json = R"(
         {
             "status": "OK",
@@ -51,5 +54,5 @@ void testEndpoint(http::HttpConnection& conn) {
         }
     )";
 
-    conn.data("application/json", Status::OK, json);
+    c.json(json);
 }
