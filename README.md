@@ -24,14 +24,14 @@ int main() {
     http::HttpServer server("localhost", 8080);
 
     // Route handlers
-    server.setHandler(myHandler);       // Default handler for / & fallback
+    server.GET("/", myHandler);       // Website endpoint
     server.GET("/test", testEndpoint);  // JSON endpoint
 
     server.run();
 }
 
 void myHandler(http::HttpConnection& c) {
-  c.sendPlainText("Hello World");
+  c.string("Hello World");
 }
 
 void testEndpoint(http::HttpConnection& c) {
@@ -42,7 +42,8 @@ void testEndpoint(http::HttpConnection& c) {
     }
   )";
 
-  c.data("application/json", Status::OK, json);
+  c.json(json);
+  // c.data("application/json", Status::OK, json); Also possible
 }
 ```
 
