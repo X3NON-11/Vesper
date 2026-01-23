@@ -16,8 +16,8 @@ My little http library I have been working on in my free time
 // ====================
 // All functions
 // ====================
-void myHandler(http::HttpConnection& conn);
-void testEndpoint(http::HttpConnection& conn);
+void myHandler(http::HttpConnection& c);
+void testEndpoint(http::HttpConnection& c);
 
 int main() {
     // Start the server
@@ -30,11 +30,11 @@ int main() {
     server.run();
 }
 
-void myHandler(http::HttpConnection& conn) {
-  conn.sendPlainText("Hello World");
+void myHandler(http::HttpConnection& c) {
+  c.sendPlainText("Hello World");
 }
 
-void testEndpoint(http::HttpConnection& conn) {
+void testEndpoint(http::HttpConnection& c) {
   const char* json = R"(
     {
       "status": "OK",
@@ -42,7 +42,7 @@ void testEndpoint(http::HttpConnection& conn) {
     }
   )";
 
-  conn.data("application/json", Status::OK, json);
+  c.data("application/json", Status::OK, json);
 }
 ```
 
