@@ -1,8 +1,8 @@
 #include "http-server.h"
 
-// ====================
-// All functions
-// ====================
+// ==============================
+//         All functions
+// ==============================
 void myHandler(http::HttpConnection& c);
 void testEndpoint(http::HttpConnection& c);
 
