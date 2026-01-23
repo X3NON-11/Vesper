@@ -2,7 +2,15 @@
 My little http library I have been working on in my free time
 
 # Installation
-1. The project is not finished and currently not a library
+1. Download & extract zip file from releases
+2. Add to CMakeLists like this
+```CMake
+# Add the include directory for the library headers
+target_include_directories(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/http-server)
+
+# Link the static library
+target_link_libraries(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/http-server/libhttp-server.a)
+```
 
 # Features
 - start a server
