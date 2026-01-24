@@ -5,19 +5,21 @@
 // ==============================
 void myHandler(http::HttpConnection& c);
 void testEndpoint(http::HttpConnection& c);
+void testMiddleware(http::HttpConnection& c);
 
 int main() {
     debugging = true; // Default on
     timeDebugging = false; // Default on
 
     // Start the server
-    http::HttpServer server("localhost", 8080);
+    http::HttpServer server;
 
     // Route handlers
+    server.setMiddleware("/test", "ALL", testMiddleware);
     server.GET("/", myHandler);         // Website endpoint
     server.GET("/test", testEndpoint);  // JSON endpoint
 
-    server.run();
+    server.run("localhost", 8080);
 }
 
 // Default handler: serve a small HTML page
@@ -55,4 +57,10 @@ void testEndpoint(http::HttpConnection& c) {
     )";
 
     c.json(json);
+}
+
+void testMiddleware(http::HttpConnection& c) {
+    c.string("Middleware Started\n");
+    c.next();
+    c.string("Middleware Ended\n");
 }

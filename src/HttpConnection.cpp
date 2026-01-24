@@ -99,4 +99,15 @@ namespace http {    // HTTP-CONNECTION responsible for translating abstractions 
     void HttpConnection::sendBuffer() {
         sendBuffer(type, responseStatus);
     }
+
+    void HttpConnection::setNext(std::function<void()> fn) {
+        nextFn = fn;
+    }
+
+    void HttpConnection::next() {
+        if (nextFn) {
+            nextFn();
+            nextFn = nullptr;
+        }
+    }
 }

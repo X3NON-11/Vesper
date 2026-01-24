@@ -1,13 +1,6 @@
 #include "include/server.h"
 
 namespace http {    // TCP-SERVER
-    TcpServer::TcpServer(std::string ipAddress, int port) {
-        setupLogger();
-        log(LogType::Info, "Starting Server");
-        if (ipAddress == "localhost") ipAddress = "127.0.0.1";
-        startServer(ipAddress, port);
-    }
-
     TcpServer::~TcpServer() {
         closeServer();
         log(LogType::Info, "Closed Server");
