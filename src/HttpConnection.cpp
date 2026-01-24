@@ -54,6 +54,7 @@ namespace http {    // HTTP-RESPONSE used to convert http logic to tcp logic
 namespace http {    // HTTP-CONNECTION responsible for translating abstractions to tcp usable format
     HttpConnection::HttpConnection(int client) : client(client) {}
 
+    // All abstractions like c.string to send plain text
     void HttpConnection::sendErrorNoHandler() {
         string(HttpResponse::StatusCodes::INTERNAL_SERVER_ERROR, "No handler parsed");
         log(LogType::Warn, "No handler parsed");
@@ -89,6 +90,7 @@ namespace http {    // HTTP-CONNECTION responsible for translating abstractions 
         data(type, HttpResponse::StatusCodes::OK, body);
     }
 
+    // Buffer for messages
     void HttpConnection::sendBuffer(std::string type, HttpResponse::StatusCodes status) {
         HttpResponse response(status, bodyBuffer, type);
         std::string http = response.toHttpString();
@@ -100,10 +102,13 @@ namespace http {    // HTTP-CONNECTION responsible for translating abstractions 
         sendBuffer(type, responseStatus);
     }
 
-    void HttpConnection::setNext(std::function<void()> fn) {
+    // Middleware
+    // Used to set the next middleware for the HttpConnection from HttpServer
+    void HttpConnection::setNext(std::function<void()> fn) { 
         nextFn = fn;
     }
 
+    // Used in middleware to stop at this point, execute next middleware, then proceed
     void HttpConnection::next() {
         if (nextFn) {
             nextFn();

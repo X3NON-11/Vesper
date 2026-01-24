@@ -1,11 +1,13 @@
 #include "include/server.h"
 
 namespace http {    // TCP-SERVER
+    // Automatically clean up when closing
     TcpServer::~TcpServer() {
         closeServer();
         log(LogType::Info, "Closed Server");
     }
 
+    // Close Tcp Socket
     void TcpServer::closeServer() {
         if (listenSocket >= 0) {
             close(listenSocket);
@@ -13,7 +15,15 @@ namespace http {    // TCP-SERVER
         }
     }
 
+    // Sets up a basic Tcp Socket
     int TcpServer::startServer(std::string ipAddress, int port) {
+        /*  ##### Inspiration #####
+
+            https://github.com/bozkurthan/Simple-TCP-Server-Client-CPP-Example/blob/master/tcp-Server.cpp
+            https://www.geeksforgeeks.org/c/tcp-server-client-implementation-in-c/
+            https://man7.org/linux/man-pages/man2/bind.2.html etc.
+        */
+
         struct sockaddr_in server_addr;
         std::memset(&server_addr, 0, sizeof(server_addr)); // Zero-initialize
         server_addr.sin_family = AF_INET;
@@ -48,8 +58,10 @@ namespace http {    // TCP-SERVER
         return 0;
     }
 
+    // Should run multithreaded (HttpServer does that)
     void TcpServer::runServer() {
         log(LogType::Info, "Accept client");
+        // Infinitly accepts new clients on socket and forwards them by executing onClient()
         while (true) {
             int client = accept(listenSocket, nullptr, nullptr);
             if (client < 0) {
@@ -61,6 +73,8 @@ namespace http {    // TCP-SERVER
         }
     }
 
+    // Just a basic placeholder
+    // Is overwritten in HttpServer
     void TcpServer::onClient(int client) {
         log(LogType::Info, "Client accepted");
         HttpConnection connection(client);
