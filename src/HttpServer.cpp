@@ -75,15 +75,6 @@ namespace http {    // HTTP-SERVER
         log(LogType::Info, "Succesfully created endpoint [" + endpoint + "]");
     }
 
-    // Every Method for http using presets for createEndpoint()
-    void HttpServer::GET(std::string endpoint, std::function<void(HttpConnection&)> h) { createEndpoint("GET", endpoint, h); }
-    void HttpServer::POST(std::string endpoint, std::function<void(HttpConnection&)> h) { createEndpoint("POST", endpoint, h); }
-    void HttpServer::PUT(std::string endpoint, std::function<void(HttpConnection&)> h) { createEndpoint("PUT", endpoint, h); }
-    void HttpServer::DELETE(std::string endpoint, std::function<void(HttpConnection&)> h) { createEndpoint("DELETE", endpoint, h); }
-    void HttpServer::PATCH(std::string endpoint, std::function<void(HttpConnection&)> h) { createEndpoint("PATCH", endpoint, h); }
-    void HttpServer::OPTIONS(std::string endpoint, std::function<void(HttpConnection&)> h) { createEndpoint("OPTIONS", endpoint, h); }
-    void HttpServer::HEAD(std::string endpoint, std::function<void(HttpConnection&)> h) { createEndpoint("HEAD", endpoint, h); }
-
     // Middleware
     // Create a middleware by saving it to allMiddleware
     // This then gets processed in runMiddlewares()

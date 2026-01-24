@@ -15,9 +15,9 @@ int main() {
     http::HttpServer server;
 
     // Route handlers
-    server.setMiddleware("/test", "ALL", testMiddleware);
+    // server.setMiddleware("/test", "ALL", testMiddleware);
     server.GET("/", myHandler);         // Website endpoint
-    server.GET("/test", testEndpoint);  // JSON endpoint
+    server.GET("/test", testMiddleware, testEndpoint);  // JSON endpoint
 
     server.run("localhost", 8080);
 }
@@ -60,7 +60,7 @@ void testEndpoint(http::HttpConnection& c) {
 }
 
 void testMiddleware(http::HttpConnection& c) {
-    c.string("Middleware Started\n");
+    c.string("Middleware Started\n\n");
     c.next();
-    c.string("Middleware Ended\n");
+    c.string("\n\nMiddleware Ended\n");
 }

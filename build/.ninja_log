@@ -1,12 +1,12 @@
 # ninja log v7
 462	512	1769178665493211378	http-server	f24af44b22fd68b8
-0	25	1769286980478419976	build.ninja	ffd63d0a0c91df0b
-0	25	1769286980477419973	/home/xenon/PROJECTS/cpp/http-server/build/cmake_install.cmake	ffd63d0a0c91df0b
-4	621	1769284456139138145	CMakeFiles/http-server.dir/src/HttpConnection.cpp.o	d75dc0deacc165d6
-4	595	1769284456140432284	CMakeFiles/http-server.dir/src/TcpServer.cpp.o	887dbdb7d49f159a
-3	682	1769284468193358811	CMakeFiles/http-server.dir/src/HttpServer.cpp.o	85dc4d1ecaf109ba
-682	737	1769284468872371170	libhttp-server.a	177840706dc1c613
-3	567	1769286986590167053	CMakeFiles/http-server.dir/src/TcpServer.cpp.o	887dbdb7d49f159a
-3	589	1769286986589432398	CMakeFiles/http-server.dir/src/HttpConnection.cpp.o	d75dc0deacc165d6
-3	735	1769286996800454091	CMakeFiles/http-server.dir/src/HttpServer.cpp.o	85dc4d1ecaf109ba
-736	807	1769286997533455694	libhttp-server.a	177840706dc1c613
+0	25	1769294924213141544	build.ninja	ffd63d0a0c91df0b
+0	25	1769294924212095016	/home/xenon/PROJECTS/cpp/http-server/build/cmake_install.cmake	ffd63d0a0c91df0b
+3	607	1769294781211306360	CMakeFiles/http-server.dir/src/HttpConnection.cpp.o	d75dc0deacc165d6
+4	589	1769294781212735835	CMakeFiles/http-server.dir/src/TcpServer.cpp.o	887dbdb7d49f159a
+3	732	1769294781210306348	CMakeFiles/http-server.dir/src/HttpServer.cpp.o	85dc4d1ecaf109ba
+732	778	1769294781939315463	libhttp-server.a	177840706dc1c613
+3	587	1769294927036130340	CMakeFiles/http-server.dir/src/TcpServer.cpp.o	887dbdb7d49f159a
+2	593	1769294927036037562	CMakeFiles/http-server.dir/src/HttpConnection.cpp.o	d75dc0deacc165d6
+2	725	1769294927035130327	CMakeFiles/http-server.dir/src/HttpServer.cpp.o	85dc4d1ecaf109ba
+725	794	1769294927758139371	libhttp-server.a	177840706dc1c613
