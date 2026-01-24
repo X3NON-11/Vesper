@@ -19,14 +19,15 @@ namespace http {
             int listenSocket;
             int port;
 
-            int startServer(std::string ipAddress, int port);
-            void closeServer();
         public:
-            TcpServer(std::string ipAddress, int port);
+            TcpServer() = default;
             virtual ~TcpServer(); // Allows overide for subclasses (HttpServer)
 
             void runServer();
-            virtual void onClient(int client);    // DOESN'T DO ANYTHING YET
+            virtual void onClient(int client);
+
+            int startServer(std::string ipAddress, int port);
+            void closeServer();
     };
 
     class HttpResponse { // POST
@@ -58,6 +59,7 @@ namespace http {
             HttpResponse::StatusCodes responseStatus;
             std::string bodyBuffer;
             std::string type;
+            std::function<void()> nextFn;
 
         public:
             explicit HttpConnection(int client);
@@ -73,13 +75,16 @@ namespace http {
 
             void data(std::string type, HttpResponse::StatusCodes status, std::string body);
             void data(std::string type, std::string body);
+
+            void next();
+            void setNext(std::function<void()> fn);
     };
 
     class HttpServer : public TcpServer { // All the abstractions for http
         public:
-            HttpServer(std::string ipAddress, int port);
+            HttpServer();
             ~HttpServer();
-            void run();
+            void run(std::string ipAddress, int port);
 
             void GET(std::string endpoint, std::function<void(HttpConnection&)> h);
             void POST(std::string endpoint, std::function<void(HttpConnection&)> h);
@@ -88,6 +93,9 @@ namespace http {
             void PATCH(std::string endpoint, std::function<void(HttpConnection&)> h);
             void OPTIONS(std::string endpoint, std::function<void(HttpConnection&)> h);
             void HEAD(std::string endpoint, std::function<void(HttpConnection&)> h);
+
+            void use(std::function<void(HttpConnection&)> handler);
+            void setMiddleware(std::string endpoint, std::string method, std::function<void(HttpConnection&)> handler);
 
         private:
             std::thread serverThread;
@@ -98,6 +106,15 @@ namespace http {
                 std::function<void(HttpConnection&)> handler;
             };
             std::vector<Endpoints> allEndpoints;
+
+            struct Middleware {
+                std::string endpoint;
+                std::string method;
+                std::function<void(HttpConnection&)> handler;
+                std::function<void(HttpConnection&)> nextHandler;
+            };
+            std::vector<Middleware> allMiddleware;
+            void runMiddlewares(HttpConnection& connection, std::string clientEndpoint, std::string method, int index, std::function<void()> finalHandler);
 
             void onClient(int client) override;
             void createEndpoint(std::string method, std::string endpoint, std::function<void(HttpConnection&)> h);

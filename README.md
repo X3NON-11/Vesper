@@ -29,13 +29,13 @@ void testEndpoint(http::HttpConnection& c);
 
 int main() {
     // Start the server
-    http::HttpServer server("localhost", 8080);
+    http::HttpServer server;
 
     // Route handlers
     server.GET("/", myHandler);       // Website endpoint
     server.GET("/test", testEndpoint);  // JSON endpoint
 
-    server.run();
+    server.run("localhost", 8080);
 }
 
 void myHandler(http::HttpConnection& c) {
