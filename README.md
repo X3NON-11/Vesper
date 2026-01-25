@@ -14,8 +14,9 @@ target_link_libraries(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/http-ser
 
 # Features
 - start a server
-- send plain text
-- different endpoints
+- send plain text etc.
+- endpoints
+- middleware
 
 # How to use
 ```c++
