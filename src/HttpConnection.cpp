@@ -31,7 +31,7 @@ namespace http {    // HTTP-RESPONSE used to convert http logic to tcp logic
         return "HTTP/1.1 " +
             std::to_string(static_cast<int>(status)) + " " +
             statusToString(status) + "\r\n" +
-            contentType + "\r\n" +
+            "Content-Type: " + contentType + "\r\n" +
             "Content-Length: " + std::to_string(body.size()) + "\r\n" +
             "\r\n" +
             body;
@@ -52,7 +52,7 @@ namespace http {    // HTTP-RESPONSE used to convert http logic to tcp logic
 }
 
 namespace http {    // HTTP-CONNECTION responsible for translating abstractions to tcp usable format
-    HttpConnection::HttpConnection(int client) : client(client) {}
+    HttpConnection::HttpConnection(int client, std::string clientBuffer) : client(client), clientBuffer(clientBuffer) {}
 
     // All abstractions like c.string to send plain text
     void HttpConnection::sendErrorNoHandler() {
@@ -61,14 +61,17 @@ namespace http {    // HTTP-CONNECTION responsible for translating abstractions 
     }
 
     void HttpConnection::string(HttpResponse::StatusCodes status, std::string body) {
+        if (bodyBuffer != "") log(LogType::Warn, "Only one message is intended - the first content header applies to both");
         bodyBuffer += body;
         type = "text/plain";
+        responseStatus = status;
     }
     void HttpConnection::string(std::string body) {
         string(HttpResponse::StatusCodes::OK, body);
     }
 
     void HttpConnection::json(HttpResponse::StatusCodes status, std::string jsonBody) {
+        if (bodyBuffer != "") log(LogType::Warn, "Only one message is intended - the first content header applies to both");
         bodyBuffer += jsonBody;
         type = "application/json";
         responseStatus = status;
@@ -82,6 +85,7 @@ namespace http {    // HTTP-CONNECTION responsible for translating abstractions 
     }
 
     void HttpConnection::data(std::string type, HttpResponse::StatusCodes status, std::string body) {
+        if (bodyBuffer != "") log(LogType::Warn, "Only one message is intended - the first content header applies to both");
         bodyBuffer += body;
         this->type = type;
         responseStatus = status;
@@ -114,5 +118,16 @@ namespace http {    // HTTP-CONNECTION responsible for translating abstractions 
             nextFn();
             nextFn = nullptr;
         }
+    }
+
+    // Receive client data (POST etc.)
+    std::string HttpConnection::postForm(std::string clientString) {
+        int pos = clientBuffer.find('=');
+        if (pos != std::string::npos) {
+            std::string parameter = clientBuffer.substr(0, pos); // Everything before =
+            std::string value = clientBuffer.substr(pos + 1); // Everything after =
+            if (parameter==clientString) return value;
+        }
+        return "";
     }
 }

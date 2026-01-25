@@ -4,3 +4,4 @@
  [INFO] Bind socket to ip-address
  [INFO] Listen on socket
  [INFO] Accept client
+ [INFO] Client accepted

@@ -6,18 +6,21 @@
 void myHandler(http::HttpConnection& c);
 void testEndpoint(http::HttpConnection& c);
 void testMiddleware(http::HttpConnection& c);
+void postEndpoint(http::HttpConnection& c);
 
 int main() {
     debugging = true; // Default on
     timeDebugging = false; // Default on
+    ignoreWarnings = false; // Default off
 
     // Start the server
     http::HttpServer server;
 
     // Route handlers
     // server.setMiddleware("/test", "ALL", testMiddleware);
-    server.GET("/", myHandler);         // Website endpoint
-    server.GET("/test", testMiddleware, testEndpoint);  // JSON endpoint
+    server.GET("/", myHandler); // Website endpoint
+    server.GET("/test", testMiddleware, testEndpoint); // JSON endpoint
+    server.POST("/post", postEndpoint);
 
     server.run("localhost", 8080);
 }
@@ -63,4 +66,9 @@ void testMiddleware(http::HttpConnection& c) {
     c.string("Middleware Started\n\n");
     c.next();
     c.string("\n\nMiddleware Ended\n");
+}
+
+void postEndpoint(http::HttpConnection& c) {
+    std::string message = c.postForm("test");
+    message == "" ? c.string("No message") : c.string(message);
 }

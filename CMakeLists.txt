@@ -12,5 +12,5 @@ add_library(http-server
 target_include_directories(http-server PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # ONLY FOR TESTING PURPOSES
-# add_executable(http-server-app examples/main.cpp)
-# target_link_libraries(http-server-app http-server)
+add_executable(http-server-app examples/main.cpp)
+target_link_libraries(http-server-app http-server)

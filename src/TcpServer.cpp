@@ -77,7 +77,7 @@ namespace http {    // TCP-SERVER
     // Is overwritten in HttpServer
     void TcpServer::onClient(int client) {
         log(LogType::Info, "Client accepted");
-        HttpConnection connection(client);
+        HttpConnection connection(client, "");
         connection.sendErrorNoHandler();
         close(client);
     }

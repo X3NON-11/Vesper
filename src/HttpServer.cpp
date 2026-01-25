@@ -41,8 +41,39 @@ namespace http {    // HTTP-SERVER
             close(client);
             return;
         }
+        
+        // Get Body for POST requests
+        // Skip the "\r\n\r\n"
+        char* body = strstr(buffer, "\r\n\r\n");
+        if (body) {
+            body += 4;
+        }
+        int headerSize = body ? (body - buffer) : valread;
+        int receivedBodySize = valread - headerSize;
+        // Get the content length
+        int contentLength = 0;
+        char* cl = strstr(buffer, "Content-Length:");
+        if (cl) {
+            sscanf(cl, "Content-Length: %d", &contentLength);
+        }
+        // Receive the rest of the message if not fully received
+        while (receivedBodySize < contentLength) {
+            int r = recv(client,
+                        buffer + valread,
+                        bufferSize - valread - 1,
+                        0);
+            if (r <= 0) break;
+            valread += r;
+            receivedBodySize += r;
+        }
+        buffer[valread] = '\0';
+        // Save the body to postData
+        std::string postData = "";
+        if (body && contentLength > 0) {
+            postData.assign(body, contentLength);
+        }
 
-        HttpConnection connection(client);
+        HttpConnection connection(client, postData);
         bool handled = false;
 
         // MiddleWare / All Handlers
@@ -101,7 +132,7 @@ namespace http {    // HTTP-SERVER
             return;
         }
 
-        auto mw = allMiddleware[index];
+        auto& mw = allMiddleware[index];
 
         // Requirements for a middleware to run
         bool matches =
