@@ -73,13 +73,15 @@ namespace http {    // HTTP-SERVER
             postData.assign(body, contentLength);
         }
 
-        HttpConnection connection(client, postData);
+        HttpConnection connection(client);
+        connection.setClientBuffer(body);
         bool handled = false;
 
         // MiddleWare / All Handlers
         runMiddlewares(connection, clientEndpoint, method, 0, [&]() {
             for (auto& endpoint : allEndpoints) {
                 if (endpoint.endpoint == clientEndpoint && endpoint.method == method) {
+                    connection.setMethod(endpoint.method);
                     endpoint.handler(connection);
                     handled = true;
                     break;
