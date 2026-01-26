@@ -52,7 +52,7 @@ namespace http {    // HTTP-RESPONSE used to convert http logic to tcp logic
 }
 
 namespace http {    // HTTP-CONNECTION responsible for translating abstractions to tcp usable format
-    HttpConnection::HttpConnection(int client, std::string clientBuffer) : client(client), clientBuffer(clientBuffer) {}
+    HttpConnection::HttpConnection(int client) : client(client) {}
 
     // All abstractions like c.string to send plain text
     void HttpConnection::sendErrorNoHandler() {
@@ -120,14 +120,55 @@ namespace http {    // HTTP-CONNECTION responsible for translating abstractions 
         }
     }
 
+        // Receive client data (POST etc.)
+    std::string HttpConnection::defaultPostForm(std::string clientString, std::string defaultString) {
+        if (method == "GET") {
+            return defaultString;
+        }
+
+        // Loop through every argument by looking for '&' (except the last argument because there is no '&')
+        int start = 0;
+        int end;
+        while ((end = clientBuffer.find('&', start)) != std::string::npos) {
+            // Get whole argument substring
+            std::string parameter = clientBuffer.substr(start, end - start);
+            int equalPos = parameter.find('=');
+            if (equalPos != std::string::npos) {
+                // Get substring of everything before and after '='
+                std::string parameterName = parameter.substr(0, equalPos);
+                std::string parameterValue = parameter.substr(equalPos + 1);
+                // If matches what library user gave to postForm (clientString) return the parameter value
+                if (parameterName == clientString) return parameterValue;
+            }
+            start = end + 1;
+        }
+
+        // Redo that for the last argument that was skipped before
+        // Get whole argument substring
+        std::string lastParameter = clientBuffer.substr(start);
+        int equalPos = lastParameter.find('=');
+        if (equalPos != std::string::npos) {
+            // Get substring of everything before and after '='
+            std::string parameterName = lastParameter.substr(0, equalPos);
+            std::string parameterValue = lastParameter.substr(equalPos + 1);
+            // If matches what library user gave to postForm (clientString) return the parameter value
+            if (parameterName == clientString) return parameterValue;
+        }
+
+        // No matches return default given at the top
+        return defaultString;
+    }
+
     // Receive client data (POST etc.)
     std::string HttpConnection::postForm(std::string clientString) {
-        int pos = clientBuffer.find('=');
-        if (pos != std::string::npos) {
-            std::string parameter = clientBuffer.substr(0, pos); // Everything before =
-            std::string value = clientBuffer.substr(pos + 1); // Everything after =
-            if (parameter==clientString) return value;
-        }
-        return "";
+        return defaultPostForm(clientString, "");
+    }
+
+    void HttpConnection::setMethod(std::string method) {
+        this->method = method;
+    }
+
+    void HttpConnection::setClientBuffer(std::string clientBuffer) {
+        this->clientBuffer = clientBuffer;
     }
 }

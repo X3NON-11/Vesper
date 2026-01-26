@@ -4,6 +4,7 @@
 #include <cstdio>           // sscanf
 #include <thread>           // multithreading for different clients
 #include <iostream>         // idk
+#include <string>           // std::string::npos
 #include <cstring>          // memset
 #include <unistd.h>         // close
 #include <sys/socket.h>     // socket, bind, listen
@@ -66,12 +67,16 @@ namespace http {
             int client;
 
             HttpResponse::StatusCodes responseStatus;
+            std::string clientBuffer; // Used for POST (etc.) requests
             std::string bodyBuffer;
             std::string type;
+            std::string method;
             std::function<void()> nextFn;
 
         public:
             explicit HttpConnection(int client);
+            void setMethod(std::string method);
+            void setClientBuffer(std::string bodyBuffer);
             void sendErrorNoHandler();
             void sendBuffer(); // Sends all cashed responses together
             void sendBuffer(std::string type, HttpResponse::StatusCodes status);
@@ -91,6 +96,10 @@ namespace http {
             void next();
             // Used to set the next middleware for the HttpConnection from HttpServer
             void setNext(std::function<void()> fn);
+
+            // Receive client data (POST etc.)
+            std::string postForm(std::string clientString);
+            std::string defaultPostForm(std::string clientString, std::string defaultString);
     };
 
     // All abstractions for the httpServer itself

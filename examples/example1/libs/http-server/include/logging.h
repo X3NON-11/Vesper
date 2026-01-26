@@ -7,6 +7,7 @@
 
 inline bool debugging = true;
 inline bool timeDebugging = true;
+inline bool ignoreWarnings = false;
 inline std::ofstream file;
 
 enum class LogType {
@@ -63,6 +64,7 @@ inline void log(LogType logType, std::string message) {
             file.flush();
             break;
         case LogType::Warn:
+            if (ignoreWarnings) return;
             std::cout << dt << " [WARN] " << message << '\n';
             file << dt << " [WARN] " << message << '\n';
             file.flush();
