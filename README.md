@@ -34,7 +34,7 @@ int main() {
     http::HttpServer server;
 
     // Route handlers
-    server.GET("/", myHandler);       // Website endpoint
+    server.GET("/", myHandler);       // Hello World endpoint
     server.GET("/test", testEndpoint);  // JSON endpoint
 
     server.run("localhost", 8080);
