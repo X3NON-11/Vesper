@@ -74,6 +74,12 @@ namespace http {
             std::function<void()> nextFn;
 
         public:
+            std::string clientHeader;
+            std::string clientEndpoint;
+            std::string clientMethod;
+            std::string clientHttpVersion;
+            std::string clientQuery;
+
             explicit HttpConnection(int client);
             void setMethod(std::string method);
             void setClientBuffer(std::string bodyBuffer);
@@ -100,6 +106,7 @@ namespace http {
             // Receive client data (POST etc.)
             std::string postForm(std::string clientString);
             std::string defaultPostForm(std::string clientString, std::string defaultString);
+            std::string query(std::string clientString);
     };
 
     // All abstractions for the httpServer itself

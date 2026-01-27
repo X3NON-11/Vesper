@@ -164,6 +164,40 @@ namespace http {    // HTTP-CONNECTION responsible for translating abstractions 
         return defaultPostForm(clientString, "");
     }
 
+    std::string HttpConnection::query(std::string clientString) {
+        // Loop through every argument by looking for '&' (except the last argument because there is no '&')
+        int start = 0;
+        int end;
+        while ((end = clientQuery.find('&', start)) != std::string::npos) {
+            // Get whole argument substring
+            std::string parameter = clientQuery.substr(start, end - start);
+            int equalPos = parameter.find('=');
+            if (equalPos != std::string::npos) {
+                // Get substring of everything before and after '='
+                std::string parameterName = parameter.substr(0, equalPos);
+                std::string parameterValue = parameter.substr(equalPos + 1);
+                // If matches what library user gave to postForm (clientString) return the parameter value
+                if (parameterName == clientString) return parameterValue;
+            }
+            start = end + 1;
+        }
+
+        // Redo that for the last argument that was skipped before
+        // Get whole argument substring
+        std::string lastParameter = clientQuery.substr(start);
+        int equalPos = lastParameter.find('=');
+        if (equalPos != std::string::npos) {
+            // Get substring of everything before and after '='
+            std::string parameterName = lastParameter.substr(0, equalPos);
+            std::string parameterValue = lastParameter.substr(equalPos + 1);
+            // If matches what library user gave to postForm (clientString) return the parameter value
+            if (parameterName == clientString) return parameterValue;
+        }
+
+        // No matches return ""
+        return "";    
+    }
+
     void HttpConnection::setMethod(std::string method) {
         this->method = method;
     }

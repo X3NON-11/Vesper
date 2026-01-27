@@ -7,6 +7,7 @@ void myHandler(http::HttpConnection& c);
 void testEndpoint(http::HttpConnection& c);
 void testMiddleware(http::HttpConnection& c);
 void postEndpoint(http::HttpConnection& c);
+void queryHandler(http::HttpConnection& c);
 
 int main() {
     debugging = true; // Default on
@@ -21,6 +22,7 @@ int main() {
     server.GET("/", myHandler); // Website endpoint
     server.GET("/test", testMiddleware, testEndpoint); // JSON endpoint
     server.POST("/post", postEndpoint);
+    server.GET("/query", queryHandler);
 
     server.run("localhost", 8080);
 }
@@ -71,4 +73,9 @@ void testMiddleware(http::HttpConnection& c) {
 void postEndpoint(http::HttpConnection& c) {
     std::string message = c.postForm("test");
     message == "" ? c.string("No message") : c.string(message);
+}
+
+void queryHandler(http::HttpConnection& c) {
+    std::string message = c.query("test");
+    message != "" ? c.string(message) : c.string("No message");
 }

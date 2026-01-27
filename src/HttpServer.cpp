@@ -75,12 +75,38 @@ namespace http {    // HTTP-SERVER
 
         HttpConnection connection(client);
         connection.setClientBuffer(body);
+        // Convert to string
+        std::string header = "";
+        std::string request(buffer, valread);
+
+        // Find end of headers
+        size_t headerEnd = request.find("\r\n\r\n");
+        if (headerEnd != std::string::npos) {
+            header = request.substr(0, headerEnd);
+        }
+        connection.clientHeader = header;
+        connection.clientMethod = std::string(method);
+        connection.clientEndpoint = clientEndpoint;
+        connection.clientHttpVersion = version;
         bool handled = false;
 
+        // Adjust clientEndpoint given to the handlers so querys are disregarded
+        std::string endpointStr(clientEndpoint);
+        auto pos = endpointStr.find('?');
+        if (pos != std::string::npos) {
+            // First get position to avoid std::out_of_range
+            std::string path  = endpointStr.substr(0, pos);
+            std::string query = endpointStr.substr(pos + 1);
+            
+            std::snprintf(clientEndpoint, sizeof(clientEndpoint), "%s", path.c_str());
+            endpointStr = path;
+            connection.clientQuery = query;
+        }
+
         // MiddleWare / All Handlers
-        runMiddlewares(connection, clientEndpoint, method, 0, [&]() {
+        runMiddlewares(connection, endpointStr, method, 0, [&]() {
             for (auto& endpoint : allEndpoints) {
-                if (endpoint.endpoint == clientEndpoint && endpoint.method == method) {
+                if (endpoint.endpoint == endpointStr && endpoint.method == method) {
                     connection.setMethod(endpoint.method);
                     endpoint.handler(connection);
                     handled = true;

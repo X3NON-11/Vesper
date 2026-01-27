@@ -1,3 +1,4 @@
 /home/xenon/PROJECTS/cpp/http-server/build/CMakeFiles/http-server.dir
+/home/xenon/PROJECTS/cpp/http-server/build/CMakeFiles/http-server-app.dir
 /home/xenon/PROJECTS/cpp/http-server/build/CMakeFiles/edit_cache.dir
 /home/xenon/PROJECTS/cpp/http-server/build/CMakeFiles/rebuild_cache.dir

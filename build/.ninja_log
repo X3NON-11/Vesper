@@ -1,12 +1,16 @@
 # ninja log v7
 462	512	1769178665493211378	http-server	f24af44b22fd68b8
-0	25	1769449449390020500	build.ninja	ffd63d0a0c91df0b
-0	25	1769449449387699300	/home/xenon/PROJECTS/cpp/http-server/build/cmake_install.cmake	ffd63d0a0c91df0b
-3	678	1769449304976604117	CMakeFiles/http-server.dir/src/HttpConnection.cpp.o	d75dc0deacc165d6
-3	562	1769449314511822447	CMakeFiles/http-server.dir/src/TcpServer.cpp.o	887dbdb7d49f159a
-3	712	1769449377107668637	CMakeFiles/http-server.dir/src/HttpServer.cpp.o	85dc4d1ecaf109ba
-712	775	1769449377815657336	libhttp-server.a	177840706dc1c613
-3	583	1769449458377548658	CMakeFiles/http-server.dir/src/TcpServer.cpp.o	887dbdb7d49f159a
-2	617	1769449458376603477	CMakeFiles/http-server.dir/src/HttpConnection.cpp.o	d75dc0deacc165d6
-2	726	1769449458375603487	CMakeFiles/http-server.dir/src/HttpServer.cpp.o	85dc4d1ecaf109ba
-726	778	1769449459099595992	libhttp-server.a	177840706dc1c613
+0	25	1769525972845965478	build.ninja	ffd63d0a0c91df0b
+0	25	1769525972843493511	/home/xenon/PROJECTS/cpp/http-server/build/cmake_install.cmake	ffd63d0a0c91df0b
+2	575	1769525825584053477	CMakeFiles/http-server.dir/src/HttpConnection.cpp.o	d75dc0deacc165d6
+4	595	1769524772927794401	CMakeFiles/http-server.dir/src/TcpServer.cpp.o	887dbdb7d49f159a
+3	706	1769525689238807298	CMakeFiles/http-server.dir/src/HttpServer.cpp.o	85dc4d1ecaf109ba
+575	615	1769525826156058915	libhttp-server.a	177840706dc1c613
+4	581	1769525886958644654	CMakeFiles/http-server-app.dir/examples/main.cpp.o	eea7f0f14a482246
+581	671	1769525887535650278	http-server-app	1ddca8dcb7bdad10
+3	572	1769525980787190033	CMakeFiles/http-server-app.dir/examples/main.cpp.o	eea7f0f14a482246
+3	578	1769525980786885962	CMakeFiles/http-server.dir/src/TcpServer.cpp.o	887dbdb7d49f159a
+3	634	1769525980785573043	CMakeFiles/http-server.dir/src/HttpConnection.cpp.o	d75dc0deacc165d6
+2	737	1769525980784573033	CMakeFiles/http-server.dir/src/HttpServer.cpp.o	85dc4d1ecaf109ba
+737	804	1769525981519580401	libhttp-server.a	177840706dc1c613
+804	893	1769525981586581073	http-server-app	1ddca8dcb7bdad10

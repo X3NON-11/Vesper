@@ -88,6 +88,44 @@ build libhttp-server.a: CXX_STATIC_LIBRARY_LINKER__http-server_ CMakeFiles/http-
   TARGET_PDB = libhttp-server.pdb
   TARGET_SUPPORT_DIR = CMakeFiles/http-server.dir
 
+# =============================================================================
+# Object build statements for EXECUTABLE target http-server-app
+
+
+#############################################
+# Order-only phony target for http-server-app
+
+build cmake_object_order_depends_target_http-server-app: phony || cmake_object_order_depends_target_http-server
+
+build CMakeFiles/http-server-app.dir/examples/main.cpp.o: CXX_COMPILER__http-server-app_unscanned_ /home/xenon/PROJECTS/cpp/http-server/examples/main.cpp || cmake_object_order_depends_target_http-server-app
+  DEP_FILE = CMakeFiles/http-server-app.dir/examples/main.cpp.o.d
+  INCLUDES = -I/home/xenon/PROJECTS/cpp/http-server/src
+  OBJECT_DIR = CMakeFiles/http-server-app.dir
+  OBJECT_FILE_DIR = CMakeFiles/http-server-app.dir/examples
+  TARGET_COMPILE_PDB = CMakeFiles/http-server-app.dir/
+  TARGET_PDB = http-server-app.pdb
+  TARGET_SUPPORT_DIR = CMakeFiles/http-server-app.dir
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target http-server-app
+
+
+#############################################
+# Link the executable http-server-app
+
+build http-server-app: CXX_EXECUTABLE_LINKER__http-server-app_ CMakeFiles/http-server-app.dir/examples/main.cpp.o | libhttp-server.a || libhttp-server.a
+  DEP_FILE = CMakeFiles/http-server-app.dir/link.d
+  LINK_FLAGS = -Wl,--dependency-file=CMakeFiles/http-server-app.dir/link.d
+  LINK_LIBRARIES = libhttp-server.a
+  OBJECT_DIR = CMakeFiles/http-server-app.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  TARGET_COMPILE_PDB = CMakeFiles/http-server-app.dir/
+  TARGET_FILE = http-server-app
+  TARGET_PDB = http-server-app.pdb
+  TARGET_SUPPORT_DIR = CMakeFiles/http-server-app.dir
+
 
 #############################################
 # Utility command for edit_cache
@@ -132,7 +170,7 @@ build codegen: phony
 #############################################
 # Folder: /home/xenon/PROJECTS/cpp/http-server/build
 
-build all: phony libhttp-server.a
+build all: phony libhttp-server.a http-server-app
 
 # =============================================================================
 # Built-in targets
