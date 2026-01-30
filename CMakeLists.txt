@@ -6,6 +6,7 @@ add_library(http-server
     src/HttpServer.cpp
     src/HttpConnection.cpp
     src/TcpServer.cpp
+    src/radixTree.cpp
 )
 
 # Specify include directories for the library

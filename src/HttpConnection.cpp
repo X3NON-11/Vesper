@@ -59,7 +59,13 @@ namespace http {    // HTTP-CONNECTION responsible for translating abstractions 
         string(HttpResponse::StatusCodes::INTERNAL_SERVER_ERROR, "No handler parsed");
         log(LogType::Warn, "No handler parsed");
     }
-
+    
+    void HttpConnection::string(int status, std::string body) {
+        if (bodyBuffer != "") log(LogType::Warn, "Only one message is intended - the first content header applies to both");
+        bodyBuffer += body;
+        type = "text/plain";
+        responseStatus = static_cast<HttpResponse::StatusCodes>(status);
+    }
     void HttpConnection::string(HttpResponse::StatusCodes status, std::string body) {
         if (bodyBuffer != "") log(LogType::Warn, "Only one message is intended - the first content header applies to both");
         bodyBuffer += body;
@@ -70,6 +76,12 @@ namespace http {    // HTTP-CONNECTION responsible for translating abstractions 
         string(HttpResponse::StatusCodes::OK, body);
     }
 
+    void HttpConnection::json(int status, std::string jsonBody) {
+        if (bodyBuffer != "") log(LogType::Warn, "Only one message is intended - the first content header applies to both");
+        bodyBuffer += jsonBody;
+        type = "application/json";
+        responseStatus = static_cast<HttpResponse::StatusCodes>(status);
+    }
     void HttpConnection::json(HttpResponse::StatusCodes status, std::string jsonBody) {
         if (bodyBuffer != "") log(LogType::Warn, "Only one message is intended - the first content header applies to both");
         bodyBuffer += jsonBody;
@@ -80,10 +92,19 @@ namespace http {    // HTTP-CONNECTION responsible for translating abstractions 
         json(HttpResponse::StatusCodes::OK, jsonBody);
     }
 
+    void HttpConnection::status(int status) {
+        responseStatus = static_cast<HttpResponse::StatusCodes>(status);
+    }
     void HttpConnection::status(HttpResponse::StatusCodes status) {
         responseStatus = status;
     }
 
+    void HttpConnection::data(std::string type, int status, std::string body) {
+        if (bodyBuffer != "") log(LogType::Warn, "Only one message is intended - the first content header applies to both");
+        bodyBuffer += body;
+        this->type = type;
+        responseStatus = static_cast<HttpResponse::StatusCodes>(status);
+    }
     void HttpConnection::data(std::string type, HttpResponse::StatusCodes status, std::string body) {
         if (bodyBuffer != "") log(LogType::Warn, "Only one message is intended - the first content header applies to both");
         bodyBuffer += body;
@@ -195,7 +216,7 @@ namespace http {    // HTTP-CONNECTION responsible for translating abstractions 
         }
 
         // No matches return ""
-        return "";    
+        return "";
     }
 
     void HttpConnection::setMethod(std::string method) {

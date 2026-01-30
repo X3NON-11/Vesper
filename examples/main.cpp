@@ -72,10 +72,10 @@ void testMiddleware(http::HttpConnection& c) {
 
 void postEndpoint(http::HttpConnection& c) {
     std::string message = c.postForm("test");
-    message == "" ? c.string("No message") : c.string(message);
+    message.empty() ? c.string("No message") : c.string(message);
 }
 
 void queryHandler(http::HttpConnection& c) {
     std::string message = c.query("test");
-    message != "" ? c.string(message) : c.string("No message");
+    !message.empty() ? c.string(message) : c.string("No message\n");
 }

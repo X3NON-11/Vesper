@@ -1,3 +1,4 @@
+#include "include/radixTree.h"
 #include "include/server.h"
 
 namespace http {    // HTTP-SERVER
@@ -105,12 +106,11 @@ namespace http {    // HTTP-SERVER
 
         // MiddleWare / All Handlers
         runMiddlewares(connection, endpointStr, method, 0, [&]() {
-            for (auto& endpoint : allEndpoints) {
-                if (endpoint.endpoint == endpointStr && endpoint.method == method) {
-                    connection.setMethod(endpoint.method);
-                    endpoint.handler(connection);
+            if (endpointsTree.matchURL(endpointStr, method)) {
+                auto endpointHandler = endpointsTree.getNodeHandler(endpointStr, method);
+                if (endpointHandler) {
+                    endpointHandler(connection);
                     handled = true;
-                    break;
                 }
             }
         });
@@ -126,11 +126,7 @@ namespace http {    // HTTP-SERVER
     
     // Create & Save Endpoint to allEndpoints so it is handled in onClient()
     void HttpServer::createEndpoint(std::string method, std::string endpoint, std::function<void(HttpConnection&)> h) {
-        Endpoints newEndpoint;
-        newEndpoint.method = method;
-        newEndpoint.endpoint = endpoint;
-        newEndpoint.handler = h;
-        allEndpoints.push_back(newEndpoint);
+        endpointsTree.addURL(endpoint, method, h);
         log(LogType::Info, "Succesfully created endpoint [" + endpoint + "]");
     }
 
@@ -161,7 +157,7 @@ namespace http {    // HTTP-SERVER
         }
 
         auto& mw = allMiddleware[index];
-
+        
         // Requirements for a middleware to run
         bool matches =
             (mw.endpoint == clientEndpoint && mw.method == method) ||
@@ -170,11 +166,12 @@ namespace http {    // HTTP-SERVER
             (mw.endpoint == "ALL" && mw.method == method);
 
         if (matches) {
-            // Go to the next middleware (recursive)
+            // Set the "next" function for this middleware
             connection.setNext([&, index]() {
                 runMiddlewares(connection, clientEndpoint, method, index + 1, finalHandler);
             });
-            // Execute current handler
+
+            // Run current middleware
             mw.handler(connection);
         } else {
             // Skip this middleware

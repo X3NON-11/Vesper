@@ -4,9 +4,5 @@
  [INFO] Bind socket to ip-address
  [INFO] Listen on socket
  [INFO] Accept client
- [WARN] No handler parsed
- [INFO] Client accepted
- [INFO] Ignoring favicon request
- [WARN] No handler parsed
  [INFO] Client accepted
  [INFO] Ignoring favicon request
