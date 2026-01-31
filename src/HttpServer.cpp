@@ -105,6 +105,9 @@ void HttpServer::onClient(int client) {
         connection.clientQuery = query;
     }
 
+    connection.clientParams =
+        endpointsTree.getUrlParams(endpointStr, std::string(method));
+
     // MiddleWare / All Handlers
     runMiddlewares(connection, endpointStr, method, 0, [&]() {
         if (endpointsTree.matchURL(endpointStr, method)) {

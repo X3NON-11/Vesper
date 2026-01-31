@@ -252,7 +252,13 @@ std::string HttpConnection::query(std::string clientString) {
     return "";
 }
 
-std::string HttpConnection::param(std::string clientParam) { return ""; }
+std::string HttpConnection::param(std::string clientParam) {
+    auto it = clientParams.find(clientParam);
+    if (it != clientParams.end()) {
+        return it->second;
+    }
+    return "";
+}
 
 void HttpConnection::setMethod(std::string method) { this->method = method; }
 

@@ -1,0 +1,15 @@
+addURL()
+-> Add URL param nodes
+=> DONE
+
+matchURL()
+-> Add "wildcard" support for URL params (e.g. /users/:id/infoPage)
+
+runMiddlewares()
+-> change matches to matchURL() (requires compatability changes in matchURL)
+
+onClient()
+-> save the URL params using some kind of getURL() params function
+
+param()
+-> return the correct output of that saved params (from onClient)

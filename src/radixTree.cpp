@@ -1,5 +1,10 @@
 #include "include/radixTree.h"
 
+Tree::Tree() {
+    root = std::make_unique<Node>();
+    root->segment = "/";
+}
+
 void Tree::addURL(std::string url, std::string method,
                   std::function<void(http::HttpConnection &)> handler) {
     if (url == "/") {
@@ -27,17 +32,19 @@ void Tree::addURL(std::string url, std::string method,
             if (segment[0] != ':') {
                 // Default node
                 newNode->segment = segment;
-                current->children[segment] = std::move(newNode);
-                it = current->children.find(segment);
+                auto [insertedIt, inserted] =
+                    current->children.emplace(segment, std::move(newNode));
+                it = insertedIt;
+                current = it->second.get();
             } else {
                 // URL param node
-                newNode->segment = segment;
-                current->children[segment] = std::move(newNode);
-                it = current->children.find(segment);
+                newNode->paramName = segment.substr(1); // remove ':'
+                current->paramChild = std::move(newNode);
+                current = current->paramChild.get();
             }
+        } else {
+            current = it->second.get();
         }
-
-        current = it->second.get();
 
         if (slash == std::string::npos) {
             // Last segment: set the handler
@@ -50,84 +57,113 @@ void Tree::addURL(std::string url, std::string method,
 
 std::function<void(http::HttpConnection &)>
 Tree::getNodeHandler(std::string url, std::string method) {
-    if (!root)
+
+    if (!root) {
         return nullptr;
+    }
 
     if (url == "/") {
         auto h = root->handlers.find(method);
-        if (h == root->handlers.end()) {
-            return nullptr;
-        }
-        return h->second;
+        return (h != root->handlers.end()) ? h->second : nullptr;
     }
 
     if (!url.empty() && url[0] == '/') {
         url.erase(0, 1);
     }
-    Node *current = root.get();
-    int start = 0;
 
-    while (true) {
-        int slash = url.find('/', start);
-        std::string segment = (slash == std::string::npos)
-                                  ? url.substr(start)
-                                  : url.substr(start, slash - start);
-        auto it = current->children.find(segment);
-        if (it == current->children.end()) {
-            return nullptr; // no such route
-        }
-        current = it->second.get();
-        if (slash == std::string::npos) {
-            break; // end of path
-        }
-        start = slash + 1;
-    }
-
-    auto h = current->handlers.find(method);
-    if (h == current->handlers.end()) {
+    Node *node = matchNode(url, root.get(), 0);
+    if (!node) {
         return nullptr;
     }
-    return h->second;
+
+    auto h = node->handlers.find(method);
+    return (h != node->handlers.end()) ? h->second : nullptr;
 }
 
-bool Tree::matchURL(std::string url, std::string method, Node *currentNode,
-                    int startSlash) {
+bool Tree::matchURL(std::string url, std::string method) {
+    if (url == "/") {
+        return root->handlers.find(method) != root->handlers.end();
+    }
 
+    if (!url.empty() && url[0] == '/') {
+        url.erase(0, 1);
+    }
+
+    Node *node = matchNode(url, root.get(), 0);
+    if (!node) {
+        return false;
+    }
+
+    return node->handlers.find(method) != node->handlers.end();
+}
+
+Tree::Node *Tree::matchNode(std::string &url, Tree::Node *currentNode,
+                            int startSlash) {
     int slash = url.find('/', startSlash);
 
     std::string segment = (slash == std::string::npos)
                               ? url.substr(startSlash)
                               : url.substr(startSlash, slash - startSlash);
 
-    auto it = currentNode->children.find(segment);
-    if (it == currentNode->children.end()) {
-        return false;
-    }
+    Tree::Node *nextNode = nullptr;
 
-    currentNode = it->second.get();
+    // Exact match first
+    auto it = currentNode->children.find(segment);
+    if (it != currentNode->children.end()) {
+        nextNode = it->second.get();
+    }
+    // Param match
+    else if (currentNode->paramChild) {
+        nextNode = currentNode->paramChild.get();
+    } else {
+        return nullptr;
+    }
 
     if (slash == std::string::npos) {
-        auto h = currentNode->handlers.find(method);
-        return h != currentNode->handlers.end();
+        return nextNode;
     }
 
-    return matchURL(url, method, currentNode, slash + 1);
+    return matchNode(url, nextNode, slash + 1);
 }
 
-bool Tree::matchURL(std::string url, std::string method) {
-    if (url == "/") {
-        auto h = root->handlers.find(method);
-        return h != root->handlers.end();
-    }
+std::unordered_map<std::string, std::string>
+Tree::getUrlParams(std::string url, std::string method) {
+    std::unordered_map<std::string, std::string> params;
 
     if (!url.empty() && url[0] == '/') {
         url.erase(0, 1);
     }
 
-    return matchURL(url, method, root.get(), 0);
-}
+    Node *currentNode = root.get();
+    int start = 0;
 
-Tree::Tree() {
-    root = std::make_unique<Node>();
-    root->segment = "/";
+    while (start <= url.size()) {
+        int slash = url.find('/', start);
+        std::string segment = (slash == std::string::npos)
+                                  ? url.substr(start)
+                                  : url.substr(start, slash - start);
+
+        if (segment.empty())
+            break;
+
+        auto it = currentNode->children.find(segment);
+        if (it != currentNode->children.end()) {
+            currentNode = it->second.get();
+        } else if (currentNode->paramChild) {
+            currentNode = currentNode->paramChild.get();
+            params[currentNode->paramName] = segment;
+        } else {
+            return {}; // no match
+        }
+
+        if (slash == std::string::npos)
+            break;
+        start = slash + 1;
+    }
+
+    if (currentNode->handlers.find(method) == currentNode->handlers.end()) {
+        return {};
+    }
+
+    return params;
 }
