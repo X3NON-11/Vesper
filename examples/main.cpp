@@ -3,15 +3,16 @@
 // ==============================
 //         All functions
 // ==============================
-void myHandler(http::HttpConnection& c);
-void testEndpoint(http::HttpConnection& c);
-void testMiddleware(http::HttpConnection& c);
-void postEndpoint(http::HttpConnection& c);
-void queryHandler(http::HttpConnection& c);
+void myHandler(http::HttpConnection &c);
+void testEndpoint(http::HttpConnection &c);
+void testMiddleware(http::HttpConnection &c);
+void postEndpoint(http::HttpConnection &c);
+void queryHandler(http::HttpConnection &c);
+void userIdHandler(http::HttpConnection &c);
 
 int main() {
-    debugging = true; // Default on
-    timeDebugging = false; // Default on
+    debugging = true;       // Default on
+    timeDebugging = false;  // Default on
     ignoreWarnings = false; // Default off
 
     // Start the server
@@ -19,17 +20,18 @@ int main() {
 
     // Route handlers
     // server.setMiddleware("/test", "ALL", testMiddleware);
-    server.GET("/", myHandler); // Website endpoint
+    server.GET("/", myHandler);                        // Website endpoint
     server.GET("/test", testMiddleware, testEndpoint); // JSON endpoint
     server.POST("/post", postEndpoint);
     server.GET("/query", queryHandler);
+    server.GET("/user/:id", userIdHandler);
 
     server.run("localhost", 8080);
 }
 
 // Default handler: serve a small HTML page
-void myHandler(http::HttpConnection& c) {
-    const char* html = R"(
+void myHandler(http::HttpConnection &c) {
+    const char *html = R"(
         <!DOCTYPE html>
         <html>
         <head>
@@ -53,8 +55,8 @@ void myHandler(http::HttpConnection& c) {
 }
 
 // Test endpoint: return JSON
-void testEndpoint(http::HttpConnection& c) {
-    const char* json = R"(
+void testEndpoint(http::HttpConnection &c) {
+    const char *json = R"(
         {
             "status": "OK",
             "message": "This is a test JSON response"
@@ -64,18 +66,23 @@ void testEndpoint(http::HttpConnection& c) {
     c.json(json);
 }
 
-void testMiddleware(http::HttpConnection& c) {
+void testMiddleware(http::HttpConnection &c) {
     c.string("Middleware Started\n\n");
     c.next();
     c.string("\n\nMiddleware Ended\n");
 }
 
-void postEndpoint(http::HttpConnection& c) {
+void postEndpoint(http::HttpConnection &c) {
     std::string message = c.postForm("test");
     message.empty() ? c.string("No message") : c.string(message);
 }
 
-void queryHandler(http::HttpConnection& c) {
+void queryHandler(http::HttpConnection &c) {
     std::string message = c.query("test");
     !message.empty() ? c.string(message) : c.string("No message\n");
+}
+
+void userIdHandler(http::HttpConnection &c) {
+    std::string clientID = c.param("id");
+    c.string(clientID);
 }
