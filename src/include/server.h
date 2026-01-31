@@ -112,6 +112,7 @@ namespace http {
             std::string postForm(std::string clientString);
             std::string defaultPostForm(std::string clientString, std::string defaultString);
             std::string query(std::string clientString);
+            std::string param(std::string clientParam);
     };
 
     // All abstractions for the httpServer itself
