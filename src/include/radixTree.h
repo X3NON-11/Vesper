@@ -18,7 +18,7 @@ class Tree {
 
             std::string segment;
             std::unordered_map<std::string, std::function<void(http::HttpConnection&)>> handlers;
-            Node* paramChild = nullptr;
+            std::unique_ptr<Node> paramChild = nullptr;
             std::string paramName;
         };
         std::unique_ptr<Node> root;
@@ -27,7 +27,8 @@ class Tree {
         void addURL(std::string url, std::string method, std::function<void(http::HttpConnection&)> handler);
         std::function<void(http::HttpConnection&)> getNodeHandler(std::string url, std::string method);
         bool matchURL(std::string url, std::string method);
+        std::unordered_map<std::string, std::string> getUrlParams(std::string url, std::string method);
     
     private:
-        bool matchURL(std::string url, std::string method, Node *currentNode, int startSlash);
+        Node* matchNode(std::string &url, Node *currentNode, int startSlash);
 };

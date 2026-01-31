@@ -80,6 +80,7 @@ namespace http {
             std::string clientMethod;
             std::string clientHttpVersion;
             std::string clientQuery;
+            std::unordered_map<std::string, std::string> clientParams; // 1.String: paramName 2.String: content
 
             explicit HttpConnection(int client);
             void setMethod(std::string method);

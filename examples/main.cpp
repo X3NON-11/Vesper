@@ -84,5 +84,5 @@ void queryHandler(http::HttpConnection &c) {
 
 void userIdHandler(http::HttpConnection &c) {
     std::string clientID = c.param("id");
-    c.string(clientID);
+    clientID != "" ? c.string(clientID) : c.string("No ID parsed");
 }
