@@ -8,7 +8,7 @@
              /_/
 </pre>
 </div>       
-My little http library I have been working on in my free time
+My little gin inspired http library I have been working on in my free time
 
 
 # Installation
@@ -68,9 +68,6 @@ void testEndpoint(http::HttpConnection& c) {
   // c.data("application/json", Status::OK, json); Also possible
 }
 ```
-
-# Why?
-Because I wanted to learn more about how http servers work :)
 
 # Documentation
 1. Create Endpoints
