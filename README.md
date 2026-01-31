@@ -19,6 +19,7 @@ target_link_libraries(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/http-ser
 - middleware
 - receive client data
 - querys
+- URL parameters
 
 # How to use
 ```c++
