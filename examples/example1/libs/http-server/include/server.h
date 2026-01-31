@@ -13,6 +13,7 @@
 #include <functional>       // std::function
 
 #include "logging.h"        // My own logging library/header
+#include "radixTree.h"      // Used for the trie that saves all the endpoints
 
 namespace http {
     // The foundation of the program
@@ -79,6 +80,7 @@ namespace http {
             std::string clientMethod;
             std::string clientHttpVersion;
             std::string clientQuery;
+            std::unordered_map<std::string, std::string> clientParams; // 1.String: paramName 2.String: content
 
             explicit HttpConnection(int client);
             void setMethod(std::string method);
@@ -88,13 +90,17 @@ namespace http {
             void sendBuffer(std::string type, HttpResponse::StatusCodes status);
 
             // Abstractions for convenience (only calls data())
+            void string(int status, std::string body);
             void string(HttpResponse::StatusCodes status, std::string body);
             void string(std::string body); // Default status: 200
+            void json(int status, std::string jsonBody);
             void json(HttpResponse::StatusCodes status, std::string jsonBody);
             void json(std::string jsonBody); // Default status: 200
+            void status(int status);
             void status(HttpResponse::StatusCodes status);
 
             // Handles/Sends every supported data type by storing it correctly in the bodyBuffer
+            void data(std::string type, int status, std::string body);
             void data(std::string type, HttpResponse::StatusCodes status, std::string body);
             void data(std::string type, std::string body);
 
@@ -107,6 +113,7 @@ namespace http {
             std::string postForm(std::string clientString);
             std::string defaultPostForm(std::string clientString, std::string defaultString);
             std::string query(std::string clientString);
+            std::string param(std::string clientParam);
     };
 
     // All abstractions for the httpServer itself
@@ -195,6 +202,7 @@ namespace http {
 
         private:
             std::thread serverThread; // The thread the server/socket uses
+            Tree endpointsTree;
 
             // Store all Endpoints which are used in onClient()
             struct Endpoints {
