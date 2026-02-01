@@ -260,6 +260,14 @@ std::string HttpConnection::param(std::string clientParam) {
     return "";
 }
 
+std::string HttpConnection::getHeader(std::string clientHeader) {
+    auto it = clientHeaders.find(clientHeader);
+    if (it != clientHeaders.end()) {
+        return it->second;
+    }
+    return "";
+}
+
 void HttpConnection::setMethod(std::string method) { this->method = method; }
 
 void HttpConnection::setClientBuffer(std::string clientBuffer) {

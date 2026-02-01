@@ -27,8 +27,10 @@ class Tree {
         void addURL(std::string url, std::string method, std::function<void(http::HttpConnection&)> handler);
         std::function<void(http::HttpConnection&)> getNodeHandler(std::string url, std::string method);
         bool matchURL(std::string url, std::string method);
+        bool matchPrefixURL(std::string url, std::string method); // Only used for middleware
         std::unordered_map<std::string, std::string> getUrlParams(std::string url, std::string method);
-    
+        void collectPrefixHandlers(std::string url, std::string method, std::vector<std::function<void(http::HttpConnection &)>> &out);
+        
     private:
         Node* matchNode(std::string &url, Node *currentNode, int startSlash);
 };

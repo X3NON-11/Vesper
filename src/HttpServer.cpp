@@ -23,6 +23,9 @@ void HttpServer::run(std::string ipAddress, int port) {
 
 // Decides when & at what endpoint to run the handlers
 void HttpServer::onClient(int client) {
+    // Create the object that gets access by the library user
+    HttpConnection connection(client);
+
     // Getting what endpoint, method client has/wants to later run the correct
     // handler Receive data from client
     const int bufferSize = 1024;
@@ -44,6 +47,9 @@ void HttpServer::onClient(int client) {
         close(client);
         return;
     }
+
+    // Parse remaining headers
+    connection.clientHeaders = parseHeaders(buffer, bufferSize);
 
     // Get Body for POST requests
     // Skip the "\r\n\r\n"
@@ -74,7 +80,6 @@ void HttpServer::onClient(int client) {
         postData.assign(body, contentLength);
     }
 
-    HttpConnection connection(client);
     connection.setClientBuffer(body);
     // Convert to string
     std::string header = "";
@@ -168,5 +173,42 @@ void HttpServer::runMiddlewareChain(
     });
 
     mws[index](conn);
+}
+
+// Header Parsing
+std::unordered_map<std::string, std::string>
+HttpServer::parseHeaders(const char *buffer, int headerSize) {
+    std::unordered_map<std::string, std::string> receivedHeaders;
+    std::string headerStr(buffer, headerSize);
+    // https://stackoverflow.com/questions/12514510/iterate-through-lines-in-a-string-c
+    std::istringstream stream(headerStr);
+    std::string line;
+
+    while (std::getline(stream, line)) {
+        // Remove new line character at the end of the line
+        if (!line.empty() && line.back() == '\r')
+            line.pop_back();
+
+        if (line.empty())
+            break;
+
+        // Split key and value
+        int colon = line.find(':');
+        if (colon == std::string::npos)
+            continue;
+
+        std::string key = line.substr(0, colon);
+        std::string value = line.substr(colon + 1);
+
+        // Remove white spaces
+        // https://stackoverflow.com/questions/83439/remove-spaces-from-stdstring-in-c
+        key.erase(std::remove_if(key.begin(), key.end(), ::isspace), key.end());
+        // Erase from 0 to the first non space/tab character
+        value.erase(0, value.find_first_not_of(" \t"));
+
+        receivedHeaders[key] = value;
+    }
+
+    return receivedHeaders;
 }
 } // namespace http

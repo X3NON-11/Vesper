@@ -11,6 +11,8 @@
 #include <netinet/in.h>     // sockaddr_in
 #include <arpa/inet.h>      // htons, inet_aton
 #include <functional>       // std::function
+#include <algorithm>        // std::remove_if
+#include <sstream>          // std::istringstream
 
 #include "logging.h"        // My own logging library/header
 #include "radixTree.h"      // Used for the trie that saves all the endpoints
@@ -81,6 +83,7 @@ namespace http {
             std::string clientHttpVersion;
             std::string clientQuery;
             std::unordered_map<std::string, std::string> clientParams; // 1.String: paramName 2.String: content
+            std::unordered_map<std::string, std::string> clientHeaders; // 1.String: headerName 2.String: content
 
             explicit HttpConnection(int client);
             void setMethod(std::string method);
@@ -114,6 +117,7 @@ namespace http {
             std::string defaultPostForm(std::string clientString, std::string defaultString);
             std::string query(std::string clientString);
             std::string param(std::string clientParam);
+            std::string getHeader(std::string clientHeader);
     };
 
     // All abstractions for the httpServer itself
@@ -215,6 +219,7 @@ namespace http {
             void onClient(int client) override;
             // Used to create endpoints by functions like GET()
             void createEndpoint(std::string method, std::string endpoint, std::function<void(HttpConnection&)> h);
+            std::unordered_map<std::string, std::string> parseHeaders(const char* buffer, int headerSize);
     };
 }
 
