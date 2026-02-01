@@ -109,12 +109,14 @@ void HttpServer::onClient(int client) {
         endpointsTree.getUrlParams(endpointStr, std::string(method));
 
     // MiddleWare / All Handlers
-    runMiddlewares(connection, endpointStr, method, 0, [&]() {
+    std::vector<std::function<void(HttpConnection &)>> middlewares;
+    middlewareTree.collectPrefixHandlers(endpointStr, method, middlewares);
+
+    runMiddlewareChain(connection, middlewares, 0, [&]() {
         if (endpointsTree.matchURL(endpointStr, method)) {
-            auto endpointHandler =
-                endpointsTree.getNodeHandler(endpointStr, method);
-            if (endpointHandler) {
-                endpointHandler(connection);
+            auto h = endpointsTree.getNodeHandler(endpointStr, method);
+            if (h) {
+                h(connection);
                 handled = true;
             }
         }
@@ -142,51 +144,29 @@ void HttpServer::createEndpoint(std::string method, std::string endpoint,
 // This then gets processed in runMiddlewares()
 void HttpServer::setMiddleware(std::string endpoint, std::string method,
                                std::function<void(HttpConnection &)> handler) {
-    Middleware newMiddleware;
-    newMiddleware.endpoint = endpoint;
-    newMiddleware.method = method;
-    newMiddleware.handler = handler;
-    newMiddleware.nextHandler = nullptr;
-    allMiddleware.push_back(newMiddleware);
+    middlewareTree.addURL(endpoint, method, handler);
+    log(LogType::Info, "Succesfully created middleware  [" + endpoint + "]");
 }
 // Sets a global middleware
 void HttpServer::use(std::function<void(HttpConnection &)> handler) {
-    setMiddleware("ALL", "ALL", handler);
+    middlewareTree.addURL("/", "ALL", handler);
+    log(LogType::Info, "Succesfully created middleware  [ / ]");
 }
 
 // Recursive function that goes through every Middleware to decide what to run
-void HttpServer::runMiddlewares(HttpConnection &connection,
-                                std::string clientEndpoint, std::string method,
-                                int index, std::function<void()> finalHandler) {
-    // If went through every Middleware run the given function
-    // The given function is in onClient()
-    // Which goes through every endpoint and runs the correct handler
-    if (index >= allMiddleware.size()) {
+void HttpServer::runMiddlewareChain(
+    HttpConnection &conn,
+    std::vector<std::function<void(HttpConnection &)>> &mws, size_t index,
+    std::function<void()> finalHandler) {
+    if (index >= mws.size()) {
         finalHandler();
         return;
     }
 
-    auto &mw = allMiddleware[index];
+    conn.setNext([&, index]() {
+        runMiddlewareChain(conn, mws, index + 1, finalHandler);
+    });
 
-    // Requirements for a middleware to run
-    bool matches = (mw.endpoint == clientEndpoint && mw.method == method) ||
-                   (mw.endpoint == clientEndpoint && mw.method == "ALL") ||
-                   (mw.endpoint == "ALL" && mw.method == "ALL") ||
-                   (mw.endpoint == "ALL" && mw.method == method);
-
-    if (matches) {
-        // Set the "next" function for this middleware
-        connection.setNext([&, index]() {
-            runMiddlewares(connection, clientEndpoint, method, index + 1,
-                           finalHandler);
-        });
-
-        // Run current middleware
-        mw.handler(connection);
-    } else {
-        // Skip this middleware
-        runMiddlewares(connection, clientEndpoint, method, index + 1,
-                       finalHandler);
-    }
+    mws[index](conn);
 }
 } // namespace http

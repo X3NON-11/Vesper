@@ -203,25 +203,12 @@ namespace http {
         private:
             std::thread serverThread; // The thread the server/socket uses
             Tree endpointsTree;
-
-            // Store all Endpoints which are used in onClient()
-            struct Endpoints {
-                std::string endpoint;
-                std::string method;
-                std::function<void(HttpConnection&)> handler;
-            };
-            std::vector<Endpoints> allEndpoints;
-
-            // Store every Middleware which is used in onClient()/runMiddleware()
-            struct Middleware {
-                std::string endpoint;
-                std::string method;
-                std::function<void(HttpConnection&)> handler;
-                std::function<void(HttpConnection&)> nextHandler;
-            };
-            std::vector<Middleware> allMiddleware;
+            Tree middlewareTree;
+            
             // Recursive function which loops over every middleware in an onion style
-            void runMiddlewares(HttpConnection& connection, std::string clientEndpoint, std::string method, int index, std::function<void()> finalHandler);
+            void runMiddlewareChain(HttpConnection &conn,
+                        std::vector<std::function<void(HttpConnection &)>> &mws,
+                        size_t index, std::function<void()> finalHandler);
 
             // Overrides the onClient() from TcpServer
             // Decides on what endpoint & when to run what handler/middleware
