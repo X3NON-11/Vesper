@@ -1,14 +1,9 @@
 <div align="center">
-<pre>
-▗▖ ▗▖▗▄▄▄▖▗▄▄▄▖▗▄▄▖       ▗▄▄▖▗▄▄▄▖▗▄▄▖ ▗▖  ▗▖▗▄▄▄▖▗▄▄▖ 
-▐▌ ▐▌  █    █  ▐▌ ▐▌     ▐▌   ▐▌   ▐▌ ▐▌▐▌  ▐▌▐▌   ▐▌ ▐▌
-▐▛▀▜▌  █    █  ▐▛▀▘  ▀▀▀  ▝▀▚▖▐▛▀▀▘▐▛▀▚▖▐▌  ▐▌▐▛▀▀▘▐▛▀▚▖
-▐▌ ▐▌  █    █  ▐▌        ▗▄▄▞▘▐▙▄▄▖▐▌ ▐▌ ▝▚▞▘ ▐▙▄▄▖▐▌ ▐▌
-                                                   
-</pre>
+  
+# HTTP Server
+  
+ *My little Gin-inspired HTTP library I’ve been working on in my free time :)*
 </div>
-My little gin inspired http library I have been working on in my free time
-
 
 # Installation
 1. Download zip file from releases
@@ -69,13 +64,13 @@ void testEndpoint(http::HttpConnection& c) {
 }
 ```
 
-# Documentation
-1. Create Endpoints
+# Documentation  
+**Create Endpoints**  
 Use the functions GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD on the server object to create a new Endpoint.
 ```C++
 server.GET("/", handler);
 ```
-2. Creare Middleware
+**Create Middleware**  
 The function use() sets the given middleware for all endpoints.
 ```C++
 server.use(handler);
@@ -84,7 +79,7 @@ Creating a middleware for one specific endpoint can be done by parsing it before
 ```C++
 server.GET("/", middlewareHandler, handler);
 ```
-3. Send plain text, json etc
+**Send plain text, json etc**  
 Can be done by using the function data() in which you can specify everything yourself.
 ```C++
 c.data("text/plain", Status::OK, "Hello World");
@@ -93,13 +88,13 @@ But there are shortcuts using functions like string, json, status.
 ```C++
 c.string("Hello World"); // When not giving a status code it defaults to 200
 ```
-4. Querys
+**Querys**  
 Querys can be used with the query() function, which takes the query name and returns the content.
 For example in the URL it can be used as /endpoint?queryName=queryBody
 ```C++
 std::string message = c.query("message");
 ```
-5. URL Parameters
+**URL Parameters**  
 If querys aren't enough you can use URL parameters using the param() function.
 It takes in the param name and gives back the content, but for it to work you first need to specify
 the position of the parameter in the URL on endpoint creation using :
@@ -108,7 +103,7 @@ server.GET("/:test", handler);
 // LATER IN THE HANDLER
 std::string message = c.param("test");
 ```
-6. Get Headers
+**Get Headers**  
 Useful for Auth Headers etc. Can be use with the getHeader() function which takes in the header name and gives back the content
 ```C++
     std::string message = c.getHeader("message");
