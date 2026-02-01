@@ -97,6 +97,100 @@ bool Tree::matchURL(std::string url, std::string method) {
     return node->handlers.find(method) != node->handlers.end();
 }
 
+// Only used for middleware
+bool Tree::matchPrefixURL(std::string url, std::string method) {
+    if (!url.empty() && url[0] == '/') {
+        url.erase(0, 1);
+    }
+
+    Node *current = root.get();
+
+    // Root-level middleware
+    if (current->handlers.count(method) || current->handlers.count("ALL")) {
+        return true;
+    }
+
+    int start = 0;
+    while (start <= url.size()) {
+        int slash = url.find('/', start);
+        std::string segment = (slash == std::string::npos)
+                                  ? url.substr(start)
+                                  : url.substr(start, slash - start);
+
+        if (segment.empty()) {
+            break;
+        }
+
+        // Exact match first
+        auto it = current->children.find(segment);
+        if (it != current->children.end()) {
+            current = it->second.get();
+        }
+        // Param match
+        else if (current->paramChild) {
+            current = current->paramChild.get();
+        } else {
+            return false;
+        }
+
+        if (current->handlers.count(method)) {
+            return true;
+        }
+
+        if (slash == std::string::npos) {
+            break;
+        }
+        start = slash + 1;
+    }
+
+    return false;
+}
+
+void Tree::collectPrefixHandlers(
+    std::string url, std::string method,
+    std::vector<std::function<void(http::HttpConnection &)>> &out) {
+    if (!url.empty() && url[0] == '/') {
+        url.erase(0, 1);
+    }
+
+    Node *current = root.get();
+
+    // Root middleware
+    if (current->handlers.count(method))
+        out.push_back(current->handlers[method]);
+    else if (current->handlers.count("ALL"))
+        out.push_back(current->handlers["ALL"]);
+
+    int start = 0;
+    while (start <= url.size()) {
+        int slash = url.find('/', start);
+        std::string segment = (slash == std::string::npos)
+                                  ? url.substr(start)
+                                  : url.substr(start, slash - start);
+
+        if (segment.empty())
+            break;
+
+        auto it = current->children.find(segment);
+        if (it != current->children.end()) {
+            current = it->second.get();
+        } else if (current->paramChild) {
+            current = current->paramChild.get();
+        } else {
+            break;
+        }
+
+        if (current->handlers.count(method))
+            out.push_back(current->handlers[method]);
+        else if (current->handlers.count("ALL"))
+            out.push_back(current->handlers["ALL"]);
+
+        if (slash == std::string::npos)
+            break;
+        start = slash + 1;
+    }
+}
+
 Tree::Node *Tree::matchNode(std::string &url, Tree::Node *currentNode,
                             int startSlash) {
     int slash = url.find('/', startSlash);

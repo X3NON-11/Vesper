@@ -4,7 +4,12 @@
  [INFO] Bind socket to ip-address
  [INFO] Listen on socket
  [INFO] Accept client
+ [WARN] Only one message is intended - the first content header applies to both
+ [WARN] Only one message is intended - the first content header applies to both
  [INFO] Client accepted
  [INFO] Ignoring favicon request
+ [INFO] Client accepted
+ [INFO] Ignoring favicon request
+ [WARN] No handler parsed
  [INFO] Client accepted
  [INFO] Ignoring favicon request
