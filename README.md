@@ -29,6 +29,7 @@ target_link_libraries(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/http-ser
 - receive client data through body
 - querys
 - URL parameters
+- get headers
 
 # How to use
 ```c++
@@ -106,4 +107,9 @@ the position of the parameter in the URL on endpoint creation using :
 server.GET("/:test", handler);
 // LATER IN THE HANDLER
 std::string message = c.param("test");
+```
+6. Get Headers
+Useful for Auth Headers etc. Can be use with the getHeader() function which takes in the header name and gives back the content
+```C++
+    std::string message = c.getHeader("message");
 ```
