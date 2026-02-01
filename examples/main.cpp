@@ -9,6 +9,7 @@ void testMiddleware(http::HttpConnection &c);
 void postEndpoint(http::HttpConnection &c);
 void queryHandler(http::HttpConnection &c);
 void userIdHandler(http::HttpConnection &c);
+void headerHandler(http::HttpConnection &c);
 
 int main() {
     debugging = true;       // Default on
@@ -25,6 +26,7 @@ int main() {
     server.POST("/post", postEndpoint);
     server.GET("/query", queryHandler);
     server.GET("/user/:id", testMiddleware, userIdHandler);
+    server.GET("/header", headerHandler);
 
     server.run("localhost", 8080);
 }
@@ -85,4 +87,9 @@ void queryHandler(http::HttpConnection &c) {
 void userIdHandler(http::HttpConnection &c) {
     std::string clientID = c.param("id");
     clientID != "" ? c.string(clientID) : c.string("No ID parsed");
+}
+
+void headerHandler(http::HttpConnection &c) {
+    std::string message = c.getHeader("test");
+    c.string(message);
 }
