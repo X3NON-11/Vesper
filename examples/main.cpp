@@ -1,4 +1,4 @@
-#include "http-server.h"
+#include <vesper.h>
 
 // ==============================
 //         All functions
@@ -17,7 +17,7 @@ int main() {
     ignoreWarnings = false; // Default off
 
     // Start the server
-    http::HttpServer server;
+    vesper server;
 
     // Route handlers
     // server.setMiddleware("/test", "ALL", testMiddleware);

@@ -6,7 +6,7 @@
 # It is included in the main 'build.ninja'.
 
 # =============================================================================
-# Project: http-server
+# Project: vesper
 # Configurations: 
 # =============================================================================
 # =============================================================================
@@ -14,7 +14,7 @@
 #############################################
 # Rule for compiling CXX files.
 
-rule CXX_COMPILER__http-server_unscanned_
+rule CXX_COMPILER__vesper_unscanned_
   depfile = $DEP_FILE
   deps = gcc
   command = ${LAUNCHER}${CODE_CHECK}/usr/bin/c++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
@@ -24,7 +24,7 @@ rule CXX_COMPILER__http-server_unscanned_
 #############################################
 # Rule for linking CXX static library.
 
-rule CXX_STATIC_LIBRARY_LINKER__http-server_
+rule CXX_STATIC_LIBRARY_LINKER__vesper_
   command = $PRE_LINK && /usr/bin/cmake -E rm -f $TARGET_FILE && /usr/bin/ar qc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/ranlib $TARGET_FILE && $POST_BUILD
   description = Linking CXX static library $TARGET_FILE
   restat = $RESTAT
@@ -33,7 +33,7 @@ rule CXX_STATIC_LIBRARY_LINKER__http-server_
 #############################################
 # Rule for compiling CXX files.
 
-rule CXX_COMPILER__http-server-app_unscanned_
+rule CXX_COMPILER__vesper-app_unscanned_
   depfile = $DEP_FILE
   deps = gcc
   command = ${LAUNCHER}${CODE_CHECK}/usr/bin/c++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
@@ -43,7 +43,7 @@ rule CXX_COMPILER__http-server-app_unscanned_
 #############################################
 # Rule for linking CXX executable.
 
-rule CXX_EXECUTABLE_LINKER__http-server-app_
+rule CXX_EXECUTABLE_LINKER__vesper-app_
   depfile = $DEP_FILE
   deps = gcc
   command = $PRE_LINK && /usr/bin/c++ $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
@@ -63,7 +63,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = /usr/bin/cmake --regenerate-during-build -S/home/xenon/PROJECTS/cpp/http-server -B/home/xenon/PROJECTS/cpp/http-server/build
+  command = /usr/bin/cmake --regenerate-during-build -S/home/xenon/PROJECTS/cpp/vesper -B/home/xenon/PROJECTS/cpp/vesper/build
   description = Re-running CMake...
   generator = 1
 

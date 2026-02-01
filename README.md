@@ -1,6 +1,6 @@
 <div align="center">
   
-# HTTP Server
+# Vesper
   
  *My little Gin-inspired HTTP library I’ve been working on in my free time :)*
 </div>
@@ -10,10 +10,10 @@
 2. Add to CMakeLists like this
 ```CMake
 # Add the include directory for the library headers
-target_include_directories(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/http-server)
+target_include_directories(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/vesper)
 
 # Link the static library
-target_link_libraries(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/http-server/libhttp-server.a)
+target_link_libraries(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/vesper/libvesper.a)
 ```
 
 # Features
@@ -28,7 +28,7 @@ target_link_libraries(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/http-ser
 
 # How to use
 ```c++
-#include <http-server.h>
+#include <vesper.h>
 
 // ====================
 // All functions
@@ -38,7 +38,7 @@ void testEndpoint(http::HttpConnection& c);
 
 int main() {
     // Start the server
-    http::HttpServer server;
+    vesper server;
 
     // Route handlers
     server.GET("/", myHandler);       // Hello World endpoint

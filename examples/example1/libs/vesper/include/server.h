@@ -225,3 +225,4 @@ namespace http {
 
 // So you can write Status::OK instead of this
 using Status = http::HttpResponse::StatusCodes;
+using vesper = http::HttpServer;

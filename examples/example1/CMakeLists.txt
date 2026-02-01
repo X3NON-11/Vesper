@@ -11,9 +11,9 @@ add_executable(example1 src/main.cpp)
 # ==============================
 
 # Add the include directory for the library headers
-target_include_directories(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/http-server)
+target_include_directories(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/vesper)
 
 # Link the static library
-target_link_libraries(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/http-server/libhttp-server.a)
+target_link_libraries(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/vesper/libvesper.a)
 
 # IMPORTANT: This library version might be outdated, please download it from the releases
