@@ -11,7 +11,7 @@ int main() {
     timeDebugging = false; // Default on
 
     // Start the server
-    vesper server;
+    vesper::HttpServer server;
 
     // Route handlers
     server.GET("/", myHandler);        // Website endpoint

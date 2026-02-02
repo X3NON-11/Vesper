@@ -1,7 +1,7 @@
 #include "include/radixTree.h"
 #include "include/server.h"
 
-namespace http { // HTTP-SERVER
+namespace vesper { // HTTP-SERVER
 HttpServer::HttpServer() : TcpServer() {}
 
 // Close server automatically
@@ -211,4 +211,4 @@ HttpServer::parseHeaders(const char *buffer, int headerSize) {
 
     return receivedHeaders;
 }
-} // namespace http
+} // namespace vesper
