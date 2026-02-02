@@ -106,5 +106,5 @@ std::string message = c.param("test");
 **Get Headers**  
 Useful for Auth Headers etc. Can be use with the getHeader() function which takes in the header name and gives back the content
 ```C++
-    std::string message = c.getHeader("message");
+std::string message = c.getHeader("message");
 ```
