@@ -3,13 +3,13 @@
 // ==============================
 //         All functions
 // ==============================
-void myHandler(http::HttpConnection &c);
-void testEndpoint(http::HttpConnection &c);
-void testMiddleware(http::HttpConnection &c);
-void postEndpoint(http::HttpConnection &c);
-void queryHandler(http::HttpConnection &c);
-void userIdHandler(http::HttpConnection &c);
-void headerHandler(http::HttpConnection &c);
+void myHandler(vesper::HttpConnection &c);
+void testEndpoint(vesper::HttpConnection &c);
+void testMiddleware(vesper::HttpConnection &c);
+void postEndpoint(vesper::HttpConnection &c);
+void queryHandler(vesper::HttpConnection &c);
+void userIdHandler(vesper::HttpConnection &c);
+void headerHandler(vesper::HttpConnection &c);
 
 int main() {
     debugging = true;       // Default on
@@ -17,7 +17,7 @@ int main() {
     ignoreWarnings = false; // Default off
 
     // Start the server
-    vesper server;
+    vesper::HttpServer server;
 
     // Route handlers
     // server.setMiddleware("/test", "ALL", testMiddleware);
@@ -32,7 +32,7 @@ int main() {
 }
 
 // Default handler: serve a small HTML page
-void myHandler(http::HttpConnection &c) {
+void myHandler(vesper::HttpConnection &c) {
     const char *html = R"(
         <!DOCTYPE html>
         <html>
@@ -57,7 +57,7 @@ void myHandler(http::HttpConnection &c) {
 }
 
 // Test endpoint: return JSON
-void testEndpoint(http::HttpConnection &c) {
+void testEndpoint(vesper::HttpConnection &c) {
     const char *json = R"(
         {
             "status": "OK",
@@ -68,28 +68,28 @@ void testEndpoint(http::HttpConnection &c) {
     c.json(json);
 }
 
-void testMiddleware(http::HttpConnection &c) {
+void testMiddleware(vesper::HttpConnection &c) {
     c.string("Middleware Started\n\n");
     c.next();
     c.string("\n\nMiddleware Ended\n");
 }
 
-void postEndpoint(http::HttpConnection &c) {
+void postEndpoint(vesper::HttpConnection &c) {
     std::string message = c.postForm("test");
     message.empty() ? c.string("No message") : c.string(message);
 }
 
-void queryHandler(http::HttpConnection &c) {
+void queryHandler(vesper::HttpConnection &c) {
     std::string message = c.query("test");
     !message.empty() ? c.string(message) : c.string("No message\n");
 }
 
-void userIdHandler(http::HttpConnection &c) {
+void userIdHandler(vesper::HttpConnection &c) {
     std::string clientID = c.param("id");
     clientID != "" ? c.string(clientID) : c.string("No ID parsed");
 }
 
-void headerHandler(http::HttpConnection &c) {
+void headerHandler(vesper::HttpConnection &c) {
     std::string message = c.getHeader("test");
     c.string(message);
 }

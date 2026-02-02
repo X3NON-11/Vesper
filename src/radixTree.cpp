@@ -6,7 +6,7 @@ Tree::Tree() {
 }
 
 void Tree::addURL(std::string url, std::string method,
-                  std::function<void(http::HttpConnection &)> handler) {
+                  std::function<void(vesper::HttpConnection &)> handler) {
     if (url == "/") {
         root->handlers[method] = handler;
         return;
@@ -55,7 +55,7 @@ void Tree::addURL(std::string url, std::string method,
     }
 }
 
-std::function<void(http::HttpConnection &)>
+std::function<void(vesper::HttpConnection &)>
 Tree::getNodeHandler(std::string url, std::string method) {
 
     if (!root) {
@@ -148,7 +148,7 @@ bool Tree::matchPrefixURL(std::string url, std::string method) {
 
 void Tree::collectPrefixHandlers(
     std::string url, std::string method,
-    std::vector<std::function<void(http::HttpConnection &)>> &out) {
+    std::vector<std::function<void(vesper::HttpConnection &)>> &out) {
     if (!url.empty() && url[0] == '/') {
         url.erase(0, 1);
     }

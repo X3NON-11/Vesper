@@ -1,6 +1,6 @@
 #include "include/server.h"
 
-namespace http { // TCP-SERVER
+namespace vesper { // TCP-SERVER
 // Automatically clean up when closing
 TcpServer::~TcpServer() {
     closeServer();
@@ -83,4 +83,4 @@ void TcpServer::onClient(int client) {
     connection.sendErrorNoHandler();
     close(client);
 }
-} // namespace http
+} // namespace vesper

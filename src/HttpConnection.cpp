@@ -1,6 +1,6 @@
 #include "include/server.h"
 
-namespace http { // HTTP-RESPONSE used to convert http logic to tcp logic
+namespace vesper { // HTTP-RESPONSE used to convert http logic to tcp logic
 HttpResponse::HttpResponse(StatusCodes status, std::string body,
                            std::string type)
     : status(status), body(body) {
@@ -56,10 +56,11 @@ std::string HttpResponse::statusToString(StatusCodes status) {
         return "Unknown";
     }
 }
-} // namespace http
+} // namespace vesper
 
-namespace http { // HTTP-CONNECTION responsible for translating abstractions to
-                 // tcp usable format
+namespace vesper { // HTTP-CONNECTION responsible for translating abstractions
+                   // to
+                   // tcp usable format
 HttpConnection::HttpConnection(int client) : client(client) {}
 
 // All abstractions like c.string to send plain text
@@ -273,4 +274,4 @@ void HttpConnection::setMethod(std::string method) { this->method = method; }
 void HttpConnection::setClientBuffer(std::string clientBuffer) {
     this->clientBuffer = clientBuffer;
 }
-} // namespace http
+} // namespace vesper

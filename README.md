@@ -15,6 +15,20 @@ target_include_directories(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/ves
 # Link the static library
 target_link_libraries(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/vesper/libvesper.a)
 ```
+Or if you don't want to download it manually you can add this to your CMakeLists
+```CMake
+include(FetchContent)
+
+FetchContent_Declare(
+  vesper
+  GIT_REPOSITORY https://github.com/DieOlive/Vesper
+  GIT_TAG prerelease_0.94
+)
+
+FetchContent_MakeAvailable(vesper)
+
+target_link_libraries(example1 PRIVATE vesper)
+```
 
 # Features
 - start a server
@@ -38,7 +52,7 @@ void testEndpoint(http::HttpConnection& c);
 
 int main() {
     // Start the server
-    vesper server;
+    vesper::HttpServer server;
 
     // Route handlers
     server.GET("/", myHandler);       // Hello World endpoint

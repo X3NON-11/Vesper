@@ -10,10 +10,12 @@ add_executable(example1 src/main.cpp)
 #    How to add the library
 # ==============================
 
-# Add the include directory for the library headers
-target_include_directories(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/vesper)
+include(FetchContent)
 
-# Link the static library
-target_link_libraries(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/vesper/libvesper.a)
+FetchContent_Declare(
+  vesper
+  GIT_REPOSITORY https://github.com/DieOlive/Vesper
+  GIT_TAG prerelease_0.94
+)
 
-# IMPORTANT: This library version might be outdated, please download it from the releases
+target_link_libraries(example1 PRIVATE vesper)

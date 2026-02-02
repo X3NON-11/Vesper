@@ -15,9 +15,9 @@
 #include <sstream>          // std::istringstream
 
 #include "logging.h"        // My own logging library/header
-#include "radixTree.h"      // Used for the trie that saves all the endpoints
+#include "radixTree.h"      // Used for the tries that saves all the endpoints and middlewares
 
-namespace http {
+namespace vesper {
     // The foundation of the program
     // This handles the basic socket
     class TcpServer {
@@ -224,5 +224,4 @@ namespace http {
 }
 
 // So you can write Status::OK instead of this
-using Status = http::HttpResponse::StatusCodes;
-using vesper = http::HttpServer;
+using Status = vesper::HttpResponse::StatusCodes;
