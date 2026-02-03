@@ -3,8 +3,8 @@
 // ==============================
 //         All functions
 // ==============================
-void myHandler(http::HttpConnection &c);
-void testEndpoint(http::HttpConnection &c);
+void myHandler(vesper::HttpConnection &c);
+void testEndpoint(vesper::HttpConnection &c);
 
 int main() {
     debugging = true;      // Default on
@@ -21,7 +21,7 @@ int main() {
 }
 
 // Default handler: serve a small HTML page
-void myHandler(http::HttpConnection &c) {
+void myHandler(vesper::HttpConnection &c) {
     const char *html = R"(
         <!DOCTYPE html>
         <html>
@@ -46,7 +46,7 @@ void myHandler(http::HttpConnection &c) {
 }
 
 // Test endpoint: return JSON
-void testEndpoint(http::HttpConnection &c) {
+void testEndpoint(vesper::HttpConnection &c) {
     const char *json = R"(
         {
             "status": "OK",

@@ -22,7 +22,7 @@ include(FetchContent)
 FetchContent_Declare(
   vesper
   GIT_REPOSITORY https://github.com/DieOlive/Vesper
-  GIT_TAG prerelease_0.94
+  GIT_TAG prerelease_0.941
 )
 
 FetchContent_MakeAvailable(vesper)

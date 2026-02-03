@@ -1,0 +1,3 @@
+/home/xenon/PROJECTS/cpp/vesper/examples/example1/build/_deps/vesper-subbuild/CMakeFiles/vesper-populate.dir
+/home/xenon/PROJECTS/cpp/vesper/examples/example1/build/_deps/vesper-subbuild/CMakeFiles/edit_cache.dir
+/home/xenon/PROJECTS/cpp/vesper/examples/example1/build/_deps/vesper-subbuild/CMakeFiles/rebuild_cache.dir
