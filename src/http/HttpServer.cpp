@@ -1,5 +1,6 @@
-#include "include/radixTree.h"
-#include "include/server.h"
+#include "../include/http/HttpServer.h"
+#include "../include/http/radixTree.h"
+#include "../include/tcp/TcpServer.h"
 
 namespace vesper { // HTTP-SERVER
 HttpServer::HttpServer() : TcpServer() {}

@@ -3,11 +3,11 @@ project(vesper)
 
 # Create a library from your source files
 add_library(vesper
-    src/HttpServer.cpp
-    src/HttpConnection.cpp
-    src/TcpServer.cpp
-    src/radixTree.cpp
-    src/urlEncoding.cpp
+    src/http/HttpServer.cpp
+    src/http/HttpConnection.cpp
+    src/tcp/TcpServer.cpp
+    src/http/radixTree.cpp
+    src/utils/urlEncoding.cpp
 )
 
 # Specify include directories for the library

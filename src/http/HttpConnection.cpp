@@ -1,4 +1,4 @@
-#include "include/server.h"
+#include "../include/http/HttpConnection.h"
 
 namespace vesper { // HTTP-RESPONSE used to convert http logic to tcp logic
 HttpResponse::HttpResponse(StatusCodes status, std::string body,
