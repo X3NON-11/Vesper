@@ -249,7 +249,7 @@ std::string HttpConnection::query(std::string clientString) {
             return parameterValue;
     }
 
-    // No matches return ""
+    // No matches return nothing
     return "";
 }
 

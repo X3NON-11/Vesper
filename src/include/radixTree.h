@@ -30,7 +30,7 @@ class Tree {
         bool matchPrefixURL(std::string url, std::string method); // Only used for middleware
         std::unordered_map<std::string, std::string> getUrlParams(std::string url, std::string method);
         void collectPrefixHandlers(std::string url, std::string method, std::vector<std::function<void(vesper::HttpConnection &)>> &out);
-        
+      
     private:
         Node* matchNode(std::string &url, Node *currentNode, int startSlash);
 };

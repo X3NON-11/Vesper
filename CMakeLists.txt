@@ -7,6 +7,7 @@ add_library(vesper
     src/HttpConnection.cpp
     src/TcpServer.cpp
     src/radixTree.cpp
+    src/urlEncoding.cpp
 )
 
 # Specify include directories for the library
