@@ -16,6 +16,7 @@
 
 #include "logging.h"        // My own logging library/header
 #include "radixTree.h"      // Used for the tries that saves all the endpoints and middlewares
+#include "urlEncoding.h"    // Used to decode/encode url in HttpConnection
 
 namespace vesper {
     // The foundation of the program
@@ -44,7 +45,7 @@ namespace vesper {
     class HttpResponse {
         public:
             // Map every StatusCode (e.g can be accessed as Status::OK)
-            enum class StatusCodes : int { 
+            enum class StatusCodes : int {
                 OK = 200,
                 BAD_REQUEST = 400,
                 UNAUTHORIZED = 401,

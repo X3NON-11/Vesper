@@ -25,7 +25,7 @@ int main() {
     server.GET("/test", testMiddleware, testEndpoint); // JSON endpoint
     server.POST("/post", postEndpoint);
     server.GET("/query", queryHandler);
-    server.GET("/user/:id", testMiddleware, userIdHandler);
+    server.GET("/user/:id/test", testMiddleware, userIdHandler);
     server.GET("/header", headerHandler);
 
     server.run("localhost", 8080);

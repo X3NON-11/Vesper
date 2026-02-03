@@ -107,11 +107,15 @@ void HttpServer::onClient(int client) {
         std::snprintf(clientEndpoint, sizeof(clientEndpoint), "%s",
                       path.c_str());
         endpointStr = path;
-        connection.clientQuery = query;
+        connection.clientQuery = decodeURL(query);
     }
 
-    connection.clientParams =
+    std::unordered_map<std::string, std::string> parameterMap =
         endpointsTree.getUrlParams(endpointStr, std::string(method));
+    for (auto &pair : parameterMap) {
+        pair.second = decodeURL(pair.second);
+    }
+    connection.clientParams = parameterMap;
 
     // MiddleWare / All Handlers
     std::vector<std::function<void(HttpConnection &)>> middlewares;
@@ -149,7 +153,7 @@ void HttpServer::createEndpoint(std::string method, std::string endpoint,
 // This then gets processed in runMiddlewares()
 void HttpServer::setMiddleware(std::string endpoint, std::string method,
                                std::function<void(HttpConnection &)> handler) {
-    middlewareTree.addURL(endpoint, method, handler);
+    endpointsTree.addURL(endpoint, method, handler);
     log(LogType::Info, "Succesfully created middleware  [" + endpoint + "]");
 }
 // Sets a global middleware

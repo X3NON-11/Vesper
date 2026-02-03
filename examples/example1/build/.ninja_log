@@ -1,7 +1,7 @@
 # ninja log v7
-2	57	1770044335064572360	build.ninja	9d99664debc7ca6
+1	56	1770044454880303908	build.ninja	9d99664debc7ca6
 2	602	1769983908927836913	CMakeFiles/example1.dir/src/main.cpp.o	cfbad368ae414cee
 602	693	1769983909527842710	example1	10684a045c0f09cf
-2	57	1770044335063897173	/home/xenon/PROJECTS/cpp/vesper/examples/example1/build/cmake_install.cmake	9d99664debc7ca6
-1	56	1770044335064572360	build.ninja	9d99664debc7ca6
-1	56	1770044335064572360	/home/xenon/PROJECTS/cpp/vesper/examples/example1/build/cmake_install.cmake	9d99664debc7ca6
+1	56	1770044454879030911	/home/xenon/PROJECTS/cpp/vesper/examples/example1/build/cmake_install.cmake	9d99664debc7ca6
+2	54	1770044454880303908	build.ninja	9d99664debc7ca6
+2	54	1770044454880303908	/home/xenon/PROJECTS/cpp/vesper/examples/example1/build/cmake_install.cmake	9d99664debc7ca6
