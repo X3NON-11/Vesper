@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>        // std::remove_if
+#include <netinet/tcp.h>    // Set timeout
 
 #include "../utils/logging.h"        // My own logging library/header
 #include "../http/radixTree.h"      // Used for the tries that saves all the endpoints and middlewares
