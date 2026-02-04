@@ -1,4 +1,0 @@
-/home/xenon/PROJECTS/cpp/vesper/build/CMakeFiles/vesper.dir
-/home/xenon/PROJECTS/cpp/vesper/build/CMakeFiles/vesper-app.dir
-/home/xenon/PROJECTS/cpp/vesper/build/CMakeFiles/edit_cache.dir
-/home/xenon/PROJECTS/cpp/vesper/build/CMakeFiles/rebuild_cache.dir
