@@ -4,3 +4,13 @@
  [INFO] Bind socket to ip-address
  [INFO] Listen on socket
  [INFO] Accept client
+ [DEBUG] New Client
+ [DEBUG] Create HttpConnection object
+ [DEBUG] Read client request
+ [DEBUG] Parse method, endpoint, version
+ [DEBUG] Skip favicon
+ [DEBUG] Parse remaining headers
+ [DEBUG] Get Body
+ [DEBUG] Get content length
+ [DEBUG] Save postdata
+ [WARN] Client took too long to send body
