@@ -33,3 +33,12 @@
 13	1043	1770229863550998225	CMakeFiles/vesper.dir/src/http/HttpServer.cpp.o	7e897c3410d41b28
 1043	1204	1770229864580998157	libvesper.a	86b68674cb039412
 1205	1312	1770229864742998146	vesper-app	4ba611c54ab82372
+4	641	1770234028451439866	CMakeFiles/vesper.dir/src/tcp/TcpServer.cpp.o	aafb40a953b45159
+4	813	1770234028451944189	CMakeFiles/vesper-app.dir/examples/main.cpp.o	6c76a59a683068eb
+3	1136	1770234028449224496	CMakeFiles/vesper.dir/src/http/HttpServer.cpp.o	7e897c3410d41b28
+3	654	1770234056350092800	CMakeFiles/vesper.dir/src/tcp/TcpServer.cpp.o	aafb40a953b45159
+3	692	1770234056349777407	CMakeFiles/vesper.dir/src/http/HttpConnection.cpp.o	a311dcdc0748f8e6
+4	766	1770234056350388278	CMakeFiles/vesper-app.dir/examples/main.cpp.o	6c76a59a683068eb
+3	1090	1770234056348428144	CMakeFiles/vesper.dir/src/http/HttpServer.cpp.o	7e897c3410d41b28
+1090	1156	1770234057435436239	libvesper.a	86b68674cb039412
+1156	1247	1770234057501436731	vesper-app	4ba611c54ab82372

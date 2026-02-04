@@ -9,4 +9,56 @@
  [DEBUG] Read client request
  [DEBUG] Parse method, endpoint, version
  [DEBUG] Skip favicon
+ [DEBUG] Parse remaining headers
+ [DEBUG] Get Body
+ [DEBUG] Get content length
+ [DEBUG] Save postdata
+ [DEBUG] Save body to clientBuffer
+ [DEBUG] Find end of headers
+ [DEBUG] Save headers
+ [DEBUG] Save method
+ [DEBUG] Save endpoint
+ [DEBUG] Save version
+ [DEBUG] Find ? for querys
+ [DEBUG] Get URL params
+ [DEBUG] Save parameters map
+ [DEBUG] Run Middleware Chain
+ [DEBUG] Run endpoint handler
+ [DEBUG] Send buffer
+ [DEBUG] Close client connection
+ [DEBUG] Client accepted
+ [DEBUG] New Client
+ [DEBUG] Create HttpConnection object
+ [DEBUG] Read client request
+ [DEBUG] Parse method, endpoint, version
+ [DEBUG] Skip favicon
+ [DEBUG] Ignoring favicon request
+ [DEBUG] New Client
+ [DEBUG] Create HttpConnection object
+ [DEBUG] Read client request
+ [DEBUG] Parse method, endpoint, version
+ [DEBUG] Skip favicon
+ [DEBUG] Parse remaining headers
+ [DEBUG] Get Body
+ [DEBUG] Get content length
+ [DEBUG] Save postdata
+ [DEBUG] Save body to clientBuffer
+ [DEBUG] Find end of headers
+ [DEBUG] Save headers
+ [DEBUG] Save method
+ [DEBUG] Save endpoint
+ [DEBUG] Save version
+ [DEBUG] Find ? for querys
+ [DEBUG] Get URL params
+ [DEBUG] Save parameters map
+ [DEBUG] Run Middleware Chain
+ [DEBUG] Run endpoint handler
+ [DEBUG] Send buffer
+ [DEBUG] Close client connection
+ [DEBUG] Client accepted
+ [DEBUG] New Client
+ [DEBUG] Create HttpConnection object
+ [DEBUG] Read client request
+ [DEBUG] Parse method, endpoint, version
+ [DEBUG] Skip favicon
  [DEBUG] Ignoring favicon request

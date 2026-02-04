@@ -66,6 +66,7 @@ void testEndpoint(vesper::HttpConnection &c) {
     )";
 
     c.json(json);
+    c.redirect("/");
 }
 
 void testMiddleware(vesper::HttpConnection &c) {

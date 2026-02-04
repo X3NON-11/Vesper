@@ -58,9 +58,9 @@ std::string HttpResponse::statusToString(StatusCodes status) {
 }
 } // namespace vesper
 
-namespace vesper { // HTTP-CONNECTION responsible for translating abstractions
-                   // to
-                   // tcp usable format
+namespace vesper {
+// HTTP-CONNECTION responsible for translating abstractions to tcp usable format
+
 HttpConnection::HttpConnection(int client) : client(client) {}
 
 // All abstractions like c.string to send plain text
@@ -268,6 +268,8 @@ std::string HttpConnection::getHeader(std::string clientHeader) {
     }
     return "";
 }
+
+void HttpConnection::redirect(std::string endpoint) {}
 
 void HttpConnection::setMethod(std::string method) { this->method = method; }
 
