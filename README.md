@@ -1,44 +1,20 @@
 <div align="center">
-  
-# Vesper
-  
- *My little Gin-inspired HTTP library I’ve been working on in my free time :)*
+
+<img width="400" height="163" alt="VesperLogo" src="https://github.com/user-attachments/assets/00b16129-9948-4709-bffe-a2bd678601f0" />
+
+ *A Gin inspired http server library for C++*
 </div>
 
-# Installation
-1. Download zip file from releases
-2. Add to CMakeLists like this
-```CMake
-# Add the include directory for the library headers
-target_include_directories(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/vesper)
-
-# Link the static library
-target_link_libraries(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/vesper/libvesper.a)
-```
-Or if you don't want to download it manually you can add this to your CMakeLists
-```CMake
-include(FetchContent)
-
-FetchContent_Declare(
-  vesper
-  GIT_REPOSITORY https://github.com/DieOlive/Vesper
-  GIT_TAG prerelease_0.941
-)
-
-FetchContent_MakeAvailable(vesper)
-
-target_link_libraries(example1 PRIVATE vesper)
-```
-
-# Features
+  
+# Key Features
 - start a server
 - send plain text, json, etc.
 - endpoints
 - middleware
-- receive client data through body
+- receive client data through the body
 - querys
 - URL parameters
-- get headers
+- get client headers (e.g. Auth Headers)
 
 # How to use
 ```c++
@@ -76,6 +52,31 @@ void testEndpoint(http::HttpConnection& c) {
   c.json(json);
   // c.data("application/json", Status::OK, json); Also possible
 }
+```
+
+# Installation
+1. Download zip file from releases
+2. Add to CMakeLists like this
+```CMake
+# Add the include directory for the library headers
+target_include_directories(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/vesper)
+
+# Link the static library
+target_link_libraries(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/vesper/libvesper.a)
+```
+Or if you don't want to download it manually you can add this to your CMakeLists
+```CMake
+include(FetchContent)
+
+FetchContent_Declare(
+  vesper
+  GIT_REPOSITORY https://github.com/DieOlive/Vesper
+  GIT_TAG prerelease_0.942
+)
+
+FetchContent_MakeAvailable(vesper)
+
+target_link_libraries(example1 PRIVATE vesper)
 ```
 
 # Documentation  
