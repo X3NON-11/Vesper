@@ -1,10 +1,8 @@
 # ninja log v7
-2	55	1770147681273962033	build.ninja	9d99664debc7ca6
-2	602	1769983908927836913	CMakeFiles/example1.dir/src/main.cpp.o	cfbad368ae414cee
-602	693	1769983909527842710	example1	10684a045c0f09cf
-2	55	1770147681270961832	/home/xenon/PROJECTS/cpp/vesper/examples/example1/build/cmake_install.cmake	9d99664debc7ca6
-1	2532	1770147681273962033	build.ninja	9d99664debc7ca6
-1	2532	1770147681273962033	/home/xenon/PROJECTS/cpp/vesper/examples/example1/build/cmake_install.cmake	9d99664debc7ca6
+1	2532	1770232499401010453	build.ninja	9d99664debc7ca6
+3	644	1770147728196100611	CMakeFiles/example1.dir/src/main.cpp.o	1fcaea0601dcacf0
+644	735	1770147728837143524	example1	bec416b75bba403d
+1	2532	1770232499398010417	/home/xenon/PROJECTS/cpp/vesper/examples/example1/build/cmake_install.cmake	9d99664debc7ca6
 3	632	1770147681289073785	_deps/vesper-build/CMakeFiles/vesper.dir/src/utils/urlEncoding.cpp.o	8d2f0aea6133c44c
 3	955	1770147681288422159	_deps/vesper-build/CMakeFiles/vesper.dir/src/tcp/TcpServer.cpp.o	b772706fb612237c
 2	971	1770147681288140373	_deps/vesper-build/CMakeFiles/vesper.dir/src/http/HttpConnection.cpp.o	a69ec7ab50f2ff08
@@ -13,5 +11,12 @@
 2	1147	1770147681286962902	_deps/vesper-build/CMakeFiles/vesper.dir/src/http/HttpServer.cpp.o	d4e96225c8f6c120
 3	81	1770147728197127125	_deps/vesper-build/libvesper.a	d1e2a8929fafa30f
 81	152	1770147728274105833	_deps/vesper-build/vesper-app	ace420cbe617571e
-3	644	1770147728196100611	CMakeFiles/example1.dir/src/main.cpp.o	1fcaea0601dcacf0
-644	735	1770147728837143524	example1	bec416b75bba403d
+2	387	1770232499401010453	build.ninja	9d99664debc7ca6
+2	387	1770232499401010453	/home/xenon/PROJECTS/cpp/vesper/examples/example1/build/cmake_install.cmake	9d99664debc7ca6
+2	387	1770232499401010453	/home/xenon/PROJECTS/cpp/vesper/examples/example1/build/_deps/vesper-build/cmake_install.cmake	9d99664debc7ca6
+2	680	1770232499412010586	CMakeFiles/example1.dir/src/main.cpp.o	1fcaea0601dcacf0
+3	690	1770232499412461375	_deps/vesper-build/CMakeFiles/vesper-app.dir/examples/main.cpp.o	6e4cae91152ee458
+2	984	1770232499411010574	_deps/vesper-build/CMakeFiles/vesper.dir/src/http/HttpServer.cpp.o	d4e96225c8f6c120
+984	1080	1770232500393022449	_deps/vesper-build/libvesper.a	d1e2a8929fafa30f
+1080	1182	1770232500489023610	example1	bec416b75bba403d
+1080	1182	1770232500490114252	_deps/vesper-build/vesper-app	ace420cbe617571e

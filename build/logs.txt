@@ -9,8 +9,4 @@
  [DEBUG] Read client request
  [DEBUG] Parse method, endpoint, version
  [DEBUG] Skip favicon
- [DEBUG] Parse remaining headers
- [DEBUG] Get Body
- [DEBUG] Get content length
- [DEBUG] Save postdata
- [WARN] Client took too long to send body
+ [DEBUG] Ignoring favicon request

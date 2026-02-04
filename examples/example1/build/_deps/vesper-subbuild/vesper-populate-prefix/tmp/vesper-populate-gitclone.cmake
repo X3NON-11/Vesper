@@ -52,13 +52,13 @@ endif()
 
 execute_process(
   COMMAND "/usr/bin/git"
-          checkout "prerelease_0.941" --
+          checkout "prerelease_0.942" --
   WORKING_DIRECTORY "/home/xenon/PROJECTS/cpp/vesper/examples/example1/build/_deps/vesper-src"
   RESULT_VARIABLE error_code
   ${maybe_show_command}
 )
 if(error_code)
-  message(FATAL_ERROR "Failed to checkout tag: 'prerelease_0.941'")
+  message(FATAL_ERROR "Failed to checkout tag: 'prerelease_0.942'")
 endif()
 
 set(init_submodules TRUE)
