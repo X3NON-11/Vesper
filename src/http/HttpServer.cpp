@@ -27,7 +27,7 @@ void HttpServer::onClient(int client) {
     log(LogType::Debug, "New Client");
     log(LogType::Debug, "Create HttpConnection object");
     // Create the object that gets access by the library user
-    HttpConnection connection(client);
+    HttpConnection connection(client, this);
 
     // Getting what endpoint, method client has/wants to later run the correct
     // handler Receive data from client;
@@ -213,19 +213,17 @@ void HttpServer::use(std::function<void(HttpConnection &)> handler) {
 
 // Recursive function that goes through every Middleware to decide what to run
 void HttpServer::runMiddlewareChain(
-    HttpConnection &conn,
-    std::vector<std::function<void(HttpConnection &)>> &mws, size_t index,
-    std::function<void()> finalHandler) {
+    HttpConnection &c, std::vector<std::function<void(HttpConnection &)>> &mws,
+    size_t index, std::function<void()> finalHandler) {
     if (index >= mws.size()) {
         finalHandler();
         return;
     }
 
-    conn.setNext([&, index]() {
-        runMiddlewareChain(conn, mws, index + 1, finalHandler);
-    });
+    c.setNext(
+        [&, index]() { runMiddlewareChain(c, mws, index + 1, finalHandler); });
 
-    mws[index](conn);
+    mws[index](c);
 }
 
 // Header Parsing

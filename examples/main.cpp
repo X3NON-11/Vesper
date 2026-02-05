@@ -21,8 +21,8 @@ int main() {
 
     // Route handlers
     // server.setMiddleware("/test", "ALL", testMiddleware);
-    server.GET("/", myHandler);                        // Website endpoint
-    server.GET("/test", testMiddleware, testEndpoint); // JSON endpoint
+    server.GET("/", testMiddleware, myHandler); // Website endpoint
+    server.GET("/test", testEndpoint);          // JSON endpoint
     server.POST("/post", postEndpoint);
     server.GET("/query", queryHandler);
     server.GET("/user/:id/test", testMiddleware, userIdHandler);
@@ -66,7 +66,7 @@ void testEndpoint(vesper::HttpConnection &c) {
     )";
 
     c.json(json);
-    c.redirect("/");
+    // c.redirect("/");
 }
 
 void testMiddleware(vesper::HttpConnection &c) {

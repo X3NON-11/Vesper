@@ -79,8 +79,8 @@ void TcpServer::runServer() {
 // Is overwritten in HttpServer
 void TcpServer::onClient(int client) {
     log(LogType::Info, "Client accepted");
-    HttpConnection connection(client);
-    connection.sendErrorNoHandler();
+    const char *message = "No Handler parsed\n";
+    send(client, message, strlen(message), 0);
     close(client);
 }
 } // namespace vesper

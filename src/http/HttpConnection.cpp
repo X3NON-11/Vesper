@@ -1,4 +1,5 @@
 #include "../include/http/HttpConnection.h"
+#include "../include/http/HttpServer.h" // In cpp to avoid circular include
 
 namespace vesper { // HTTP-RESPONSE used to convert http logic to tcp logic
 HttpResponse::HttpResponse(StatusCodes status, std::string body,
@@ -30,10 +31,28 @@ HttpResponse::HttpResponse(StatusCodes status, std::string body,
 }
 
 std::string HttpResponse::toHttpString() {
-    return "HTTP/1.1 " + std::to_string(static_cast<int>(status)) + " " +
-           statusToString(status) + "\r\n" + "Content-Type: " + contentType +
-           "\r\n" + "Content-Length: " + std::to_string(body.size()) + "\r\n" +
-           "\r\n" + body;
+    std::string response;
+
+    // Status line
+    response += "HTTP/1.1 " + std::to_string(static_cast<int>(status)) + " " +
+                statusToString(status) + "\r\n";
+
+    // Required / default headers
+    response += "Content-Type: " + contentType + "\r\n";
+    response += "Content-Length: " + std::to_string(body.size()) + "\r\n";
+
+    // Custom headers
+    for (const auto &[key, value] : headers) {
+        response += key + ": " + value + "\r\n";
+    }
+
+    // End of headers
+    response += "\r\n";
+
+    // Body
+    response += body;
+
+    return response;
 }
 
 std::string HttpResponse::statusToString(StatusCodes status) {
@@ -56,12 +75,21 @@ std::string HttpResponse::statusToString(StatusCodes status) {
         return "Unknown";
     }
 }
+
+void HttpResponse::setHeader(const std::string &name,
+                             const std::string &value) {
+    headers[name] = value;
+}
+
+void HttpResponse::removeHeader(std::string &name) { headers.erase(name); }
+
 } // namespace vesper
 
 namespace vesper {
 // HTTP-CONNECTION responsible for translating abstractions to tcp usable format
 
-HttpConnection::HttpConnection(int client) : client(client) {}
+HttpConnection::HttpConnection(int client, vesper::HttpServer *server)
+    : client(client), server(server) {}
 
 // All abstractions like c.string to send plain text
 void HttpConnection::sendErrorNoHandler() {
@@ -140,10 +168,18 @@ void HttpConnection::data(std::string type, std::string body) {
     data(type, HttpResponse::StatusCodes::OK, body);
 }
 
+void HttpConnection::header(std::string hName, std::string hContent) {
+    responseHeaders[hName] = hContent;
+}
+
 // Buffer for messages
 void HttpConnection::sendBuffer(std::string type,
                                 HttpResponse::StatusCodes status) {
     HttpResponse response(status, bodyBuffer, type);
+    // Inject headers
+    for (const auto &header : responseHeaders) {
+        response.setHeader(header.first, header.second);
+    }
     std::string http = response.toHttpString();
 
     send(client, http.c_str(), http.size(), 0);
@@ -269,7 +305,12 @@ std::string HttpConnection::getHeader(std::string clientHeader) {
     return "";
 }
 
-void HttpConnection::redirect(std::string endpoint) {}
+void HttpConnection::redirect(std::string endpoint) {
+    status(302); // Not found
+    header("Location", endpoint);
+    sendBuffer();
+    close(client);
+}
 
 void HttpConnection::setMethod(std::string method) { this->method = method; }
 
