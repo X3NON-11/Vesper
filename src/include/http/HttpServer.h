@@ -20,73 +20,108 @@ namespace vesper {
             // Abstractions to create different endpoints (runs createEndpoint())
             template<typename... Handlers>
             void GET(std::string endpoint, Handlers&&... handlers) {
-                // Combine all handlers into one vector
                 std::vector<std::function<void(HttpConnection&)>> chain = { std::forward<Handlers>(handlers)... };
-                int index = chain.size();
-                for (int i = 0; i < index-1; i++) {
-                    setMiddleware(endpoint, "GET", chain[i]);
-                }
-                createEndpoint("GET", endpoint, chain[index-1]);
+                createEndpoint("GET", endpoint, [chain](HttpConnection &c){
+                    size_t index = 0;
+                    std::function<void()> runNext;
+                    runNext = [&](){
+                        if (index >= chain.size()) return;
+                        auto &fn = chain[index++];
+                        fn(c);
+                        if (index < chain.size()) runNext();
+                    };
+                    runNext();
+                });
             }
             template<typename... Handlers>
             void POST(std::string endpoint, Handlers&&... handlers) {
-                // Combine all handlers into one vector
                 std::vector<std::function<void(HttpConnection&)>> chain = { std::forward<Handlers>(handlers)... };
-                int index = chain.size();
-                for (int i = 0; i < index-1; i++) {
-                    setMiddleware(endpoint, "POST", chain[i]);
-                }
-                createEndpoint("POST", endpoint, chain[index-1]);
+                createEndpoint("POST", endpoint, [chain](HttpConnection &c){
+                    size_t index = 0;
+                    std::function<void()> runNext;
+                    runNext = [&](){
+                        if (index >= chain.size()) return;
+                        auto &fn = chain[index++];
+                        fn(c);
+                        if (index < chain.size()) runNext();
+                    };
+                    runNext();
+                });
             }
             template<typename... Handlers>
             void PUT(std::string endpoint, Handlers&&... handlers) {
-                // Combine all handlers into one vector
                 std::vector<std::function<void(HttpConnection&)>> chain = { std::forward<Handlers>(handlers)... };
-                int index = chain.size();
-                for (int i = 0; i < index-1; i++) {
-                    setMiddleware(endpoint, "PUT", chain[i]);
-                }
-                createEndpoint("PUT", endpoint, chain[index-1]);
+                createEndpoint("POST", endpoint, [chain](HttpConnection &c){
+                    size_t index = 0;
+                    std::function<void()> runNext;
+                    runNext = [&](){
+                        if (index >= chain.size()) return;
+                        auto &fn = chain[index++];
+                        fn(c);
+                        if (index < chain.size()) runNext();
+                    };
+                    runNext();
+                });
             }
             template<typename... Handlers>
             void DELETE(std::string endpoint, Handlers&&... handlers) {
-                // Combine all handlers into one vector
                 std::vector<std::function<void(HttpConnection&)>> chain = { std::forward<Handlers>(handlers)... };
-                int index = chain.size();
-                for (int i = 0; i < index-1; i++) {
-                    setMiddleware(endpoint, "DELETE", chain[i]);
-                }
-                createEndpoint("DELETE", endpoint, chain[index-1]);
+                createEndpoint("DELETE", endpoint, [chain](HttpConnection &c){
+                    size_t index = 0;
+                    std::function<void()> runNext;
+                    runNext = [&](){
+                        if (index >= chain.size()) return;
+                        auto &fn = chain[index++];
+                        fn(c);
+                        if (index < chain.size()) runNext();
+                    };
+                    runNext();
+                });
             }
             template<typename... Handlers>
             void PATCH(std::string endpoint, Handlers&&... handlers) {
-                // Combine all handlers into one vector
                 std::vector<std::function<void(HttpConnection&)>> chain = { std::forward<Handlers>(handlers)... };
-                int index = chain.size();
-                for (int i = 0; i < index-1; i++) {
-                    setMiddleware(endpoint, "PATCH", chain[i]);
-                }
-                createEndpoint("PATCH", endpoint, chain[index-1]);
+                createEndpoint("PATCH", endpoint, [chain](HttpConnection &c){
+                    size_t index = 0;
+                    std::function<void()> runNext;
+                    runNext = [&](){
+                        if (index >= chain.size()) return;
+                        auto &fn = chain[index++];
+                        fn(c);
+                        if (index < chain.size()) runNext();
+                    };
+                    runNext();
+                });
             }
             template<typename... Handlers>
             void OPTIONS(std::string endpoint, Handlers&&... handlers) {
-                // Combine all handlers into one vector
                 std::vector<std::function<void(HttpConnection&)>> chain = { std::forward<Handlers>(handlers)... };
-                int index = chain.size();
-                for (int i = 0; i < index-1; i++) {
-                    setMiddleware(endpoint, "OPTIONS", chain[i]);
-                }
-                createEndpoint("OPTIONS", endpoint, chain[index-1]);
+                createEndpoint("OPTIONS", endpoint, [chain](HttpConnection &c){
+                    size_t index = 0;
+                    std::function<void()> runNext;
+                    runNext = [&](){
+                        if (index >= chain.size()) return;
+                        auto &fn = chain[index++];
+                        fn(c);
+                        if (index < chain.size()) runNext();
+                    };
+                    runNext();
+                });
             }
             template<typename... Handlers>
             void HEAD(std::string endpoint, Handlers&&... handlers) {
-                // Combine all handlers into one vector
                 std::vector<std::function<void(HttpConnection&)>> chain = { std::forward<Handlers>(handlers)... };
-                int index = chain.size();
-                for (int i = 0; i < index-1; i++) {
-                    setMiddleware(endpoint, "HEAD", chain[i]);
-                }
-                createEndpoint("HEAD", endpoint, chain[index-1]);
+                createEndpoint("HEAD", endpoint, [chain](HttpConnection &c){
+                    size_t index = 0;
+                    std::function<void()> runNext;
+                    runNext = [&](){
+                        if (index >= chain.size()) return;
+                        auto &fn = chain[index++];
+                        fn(c);
+                        if (index < chain.size()) runNext();
+                    };
+                    runNext();
+                });
             }
 
             // Middleware

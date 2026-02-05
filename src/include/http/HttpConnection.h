@@ -5,6 +5,11 @@
 #include <sys/socket.h>     // socket, bind, listen
 
 #include "../utils/logging.h"
+#include "../http/radixTree.h"      // Used for the tries that saves all the endpoints and middlewares
+
+namespace vesper {
+    class HttpServer;
+}
 
 namespace vesper {
     // Conveniently set up an object with every desired parameter and then convert it to an http 1.1 string
@@ -89,9 +94,12 @@ namespace vesper {
             StatusCodes status;
             std::string body;
             std::string contentType;
+            std::unordered_map<std::string, std::string> headers;
 
             HttpResponse(StatusCodes status, std::string body, std::string type);
             std::string toHttpString();
+            void setHeader(const std::string& name, const std::string& value);
+            void removeHeader(std::string& name);
         private:
             std::string statusToString(StatusCodes status);
     };
@@ -99,6 +107,7 @@ namespace vesper {
         // Stores all the http abstractions / what you would access as a library user (e.g c.string("Hello World"); )
     class HttpConnection {
         private:
+            vesper::HttpServer* server;
             int client;
 
             HttpResponse::StatusCodes responseStatus;
@@ -106,6 +115,7 @@ namespace vesper {
             std::string bodyBuffer;
             std::string type;
             std::string method;
+            std::unordered_map<std::string, std::string> responseHeaders;
             std::function<void()> nextFn;
 
         public:
@@ -117,7 +127,8 @@ namespace vesper {
             std::unordered_map<std::string, std::string> clientParams; // 1.String: paramName 2.String: content
             std::unordered_map<std::string, std::string> clientHeaders; // 1.String: headerName 2.String: content
 
-            explicit HttpConnection(int client);
+            explicit HttpConnection(int client, vesper::HttpServer *server);
+
             void setMethod(std::string method);
             void setClientBuffer(std::string bodyBuffer);
             void sendErrorNoHandler();
@@ -134,6 +145,7 @@ namespace vesper {
             void json(std::string jsonBody); // Default status: 200
             void status(int status);
             void status(HttpResponse::StatusCodes status);
+            void header(std::string hName, std::string hContent);
 
             // Handles/Sends every supported data type by storing it correctly in the bodyBuffer
             void data(std::string type, int status, std::string body);
