@@ -179,7 +179,7 @@ void HttpServer::onClient(int client) {
     });
 
     if (!handled)
-        connection.sendErrorNoHandler();
+        connection.string(404, "");
 
     log(LogType::Debug, "Send buffer");
     connection.sendBuffer();
@@ -190,10 +190,11 @@ void HttpServer::onClient(int client) {
     log(LogType::Debug, "Client accepted");
 }
 
+// Endpoint
 // Create & Save Endpoint to allEndpoints so it is handled in onClient()
 void HttpServer::createEndpoint(std::string method, std::string endpoint,
                                 std::function<void(HttpConnection &)> h) {
-    endpointsTree.addURL(endpoint, method, h);
+    endpointsTree.addURL(endpoint, method, false, h);
     log(LogType::Info, "Succesfully created endpoint [" + endpoint + "]");
 }
 
@@ -202,12 +203,12 @@ void HttpServer::createEndpoint(std::string method, std::string endpoint,
 // This then gets processed in runMiddlewares()
 void HttpServer::setMiddleware(std::string endpoint, std::string method,
                                std::function<void(HttpConnection &)> handler) {
-    endpointsTree.addURL(endpoint, method, handler);
+    middlewareTree.addURL(endpoint, method, false, handler);
     log(LogType::Info, "Succesfully created middleware  [" + endpoint + "]");
 }
 // Sets a global middleware
 void HttpServer::use(std::function<void(HttpConnection &)> handler) {
-    middlewareTree.addURL("/", "ALL", handler);
+    middlewareTree.addURL("/", "ALL", true, handler);
     log(LogType::Info, "Succesfully created middleware  [ / ]");
 }
 
@@ -220,10 +221,19 @@ void HttpServer::runMiddlewareChain(
         return;
     }
 
-    c.setNext(
-        [&, index]() { runMiddlewareChain(c, mws, index + 1, finalHandler); });
+    bool nextCalled = false;
+
+    c.setNext([&]() {
+        nextCalled = true;
+        runMiddlewareChain(c, mws, index + 1, finalHandler);
+    });
 
     mws[index](c);
+
+    // Stop chain if middleware didn't call next()
+    if (!nextCalled) {
+        return;
+    }
 }
 
 // Header Parsing
