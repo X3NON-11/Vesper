@@ -5,10 +5,11 @@ Tree::Tree() {
     root->segment = "/";
 }
 
-void Tree::addURL(std::string url, std::string method,
+void Tree::addURL(std::string url, std::string method, bool prefix,
                   std::function<void(vesper::HttpConnection &)> handler) {
     if (url == "/") {
         root->handlers[method] = handler;
+        root->prefix = prefix;
         return;
     }
 
@@ -49,6 +50,7 @@ void Tree::addURL(std::string url, std::string method,
         if (slash == std::string::npos) {
             // Last segment: set the handler
             current->handlers[method] = handler;
+            current->prefix = prefix;
             return;
         }
         start = slash + 1;
@@ -124,17 +126,20 @@ bool Tree::matchPrefixURL(std::string url, std::string method) {
         // Exact match first
         auto it = current->children.find(segment);
         if (it != current->children.end()) {
-            current = it->second.get();
+            if (current->prefix == true)
+                current = it->second.get();
         }
         // Param match
         else if (current->paramChild) {
-            current = current->paramChild.get();
+            if (current->prefix)
+                current = current->paramChild.get();
         } else {
             return false;
         }
 
         if (current->handlers.count(method)) {
-            return true;
+            if (current->prefix)
+                return true;
         }
 
         if (slash == std::string::npos) {
@@ -156,10 +161,12 @@ void Tree::collectPrefixHandlers(
     Node *current = root.get();
 
     // Root middleware
-    if (current->handlers.count(method))
-        out.push_back(current->handlers[method]);
-    else if (current->handlers.count("ALL"))
-        out.push_back(current->handlers["ALL"]);
+    if (current->prefix || url.empty()) {
+        if (current->handlers.count(method))
+            out.push_back(current->handlers[method]);
+        else if (current->handlers.count("ALL"))
+            out.push_back(current->handlers["ALL"]);
+    }
 
     int start = 0;
     while (start <= url.size()) {
@@ -180,10 +187,13 @@ void Tree::collectPrefixHandlers(
             break;
         }
 
-        if (current->handlers.count(method))
-            out.push_back(current->handlers[method]);
-        else if (current->handlers.count("ALL"))
-            out.push_back(current->handlers["ALL"]);
+        // Root middleware (only if prefix == true)
+        if (current->prefix) {
+            if (current->handlers.count(method))
+                out.push_back(current->handlers[method]);
+            else if (current->handlers.count("ALL"))
+                out.push_back(current->handlers["ALL"]);
+        }
 
         if (slash == std::string::npos)
             break;

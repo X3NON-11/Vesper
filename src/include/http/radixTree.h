@@ -20,11 +20,12 @@ class Tree {
             std::unordered_map<std::string, std::function<void(vesper::HttpConnection&)>> handlers;
             std::unique_ptr<Node> paramChild = nullptr;
             std::string paramName;
+            bool prefix = false;
         };
         std::unique_ptr<Node> root;
         
         Tree();
-        void addURL(std::string url, std::string method, std::function<void(vesper::HttpConnection&)> handler);
+        void addURL(std::string url, std::string method, bool prefix, std::function<void(vesper::HttpConnection&)> handler);
         std::function<void(vesper::HttpConnection&)> getNodeHandler(std::string url, std::string method);
         bool matchURL(std::string url, std::string method);
         bool matchPrefixURL(std::string url, std::string method); // Only used for middleware
