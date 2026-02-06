@@ -21,12 +21,15 @@ int main() {
 
     // Route handlers
     // server.setMiddleware("/test", "ALL", testMiddleware);
-    server.GET("/", testMiddleware, myHandler); // Website endpoint
-    server.GET("/test", testEndpoint);          // JSON endpoint
+    server.GET("/", myHandler);                        // Website endpoint
+    server.GET("/test", testMiddleware, testEndpoint); // JSON endpoint
     server.POST("/post", postEndpoint);
     server.GET("/query", queryHandler);
-    server.GET("/user/:id/test", testMiddleware, userIdHandler);
     server.GET("/header", headerHandler);
+    vesper::Router group = server.group("/user");
+    group.use(testMiddleware);
+    group.GET("/:id", userIdHandler);
+    group.GET("/test", testEndpoint);
 
     server.run("localhost", 8080);
 }

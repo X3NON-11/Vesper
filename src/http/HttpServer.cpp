@@ -190,6 +190,9 @@ void HttpServer::onClient(int client) {
     log(LogType::Debug, "Client accepted");
 }
 
+vesper::Router HttpServer::group(std::string endpoint) {
+    return vesper::Router(*this, endpoint);
+}
 // Endpoint
 // Create & Save Endpoint to allEndpoints so it is handled in onClient()
 void HttpServer::createEndpoint(std::string method, std::string endpoint,
@@ -202,8 +205,9 @@ void HttpServer::createEndpoint(std::string method, std::string endpoint,
 // Create a middleware by saving it to allMiddleware
 // This then gets processed in runMiddlewares()
 void HttpServer::setMiddleware(std::string endpoint, std::string method,
+                               bool prefix,
                                std::function<void(HttpConnection &)> handler) {
-    middlewareTree.addURL(endpoint, method, false, handler);
+    middlewareTree.addURL(endpoint, method, prefix, handler);
     log(LogType::Info, "Succesfully created middleware  [" + endpoint + "]");
 }
 // Sets a global middleware
@@ -271,5 +275,31 @@ HttpServer::parseHeaders(const char *buffer, int headerSize) {
     }
 
     return receivedHeaders;
+}
+} // namespace vesper
+
+namespace vesper {
+// Responsible for server.group()
+// Works by reusing HttpServer() functions just with the correct prefix
+Router::Router(HttpServer &server, std::string prefix)
+    : server(server), prefix(prefix) {}
+
+std::string Router::validatePath(std::string endpoint) {
+    std::string path = endpoint;
+    // ensure leading slash
+    if (path[0] != '/')
+        path = '/' + path;
+
+    if (!prefix.empty()) {
+        std::string fullPath = prefix;
+        if (fullPath.back() == '/')
+            fullPath.pop_back(); // remove trailing slash
+        path = fullPath + path;
+    }
+    return path;
+}
+
+void Router::use(std::function<void(HttpConnection &)> mw) {
+    middlewares.push_back(std::move(mw));
 }
 } // namespace vesper
