@@ -26,6 +26,7 @@ int main() {
     server.POST("/post", postEndpoint);
     server.GET("/query", queryHandler);
     server.GET("/header", headerHandler);
+
     vesper::Router group = server.group("/user");
     group.use(testMiddleware);
     group.GET("/:id", userIdHandler);

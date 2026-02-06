@@ -1,10 +1,14 @@
 #include "../include/http/HttpConnection.h"
 #include "../include/http/HttpServer.h" // In cpp to avoid circular include
 
-namespace vesper { // HTTP-RESPONSE used to convert http logic to tcp logic
+namespace vesper {
+// =====================================================
+// HTTP-RESPONSE used to convert http logic to tcp logic
+// =====================================================
+
 HttpResponse::HttpResponse(StatusCodes status, std::string body,
-                           std::string type)
-    : status(status), body(body) {
+                           std::string type, std::string method)
+    : status(status), body(body), method(method) {
     if (type == "text/plain") {
         contentType = "Content-Type: text/plain; charset=utf-8";
     } else if (type == "text/html") {
@@ -83,10 +87,9 @@ void HttpResponse::setHeader(const std::string &name,
 
 void HttpResponse::removeHeader(std::string &name) { headers.erase(name); }
 
-} // namespace vesper
-
-namespace vesper {
+// =============================================================================
 // HTTP-CONNECTION responsible for translating abstractions to tcp usable format
+// =============================================================================
 
 HttpConnection::HttpConnection(int client, vesper::HttpServer *server)
     : client(client), server(server) {}
@@ -99,93 +102,84 @@ void HttpConnection::sendErrorNoHandler() {
 }
 
 void HttpConnection::string(int status, std::string body) {
-    if (bodyBuffer != "")
+    if (response.body != "")
         log(LogType::Warn, "Only one message is intended - the first content "
                            "header applies to both");
-    bodyBuffer += body;
-    type = "text/plain";
-    responseStatus = static_cast<HttpResponse::StatusCodes>(status);
+    response.body += body;
+    response.contentType = "text/plain";
+    response.status = static_cast<HttpResponse::StatusCodes>(status);
 }
 void HttpConnection::string(HttpResponse::StatusCodes status,
                             std::string body) {
-    if (bodyBuffer != "")
+    if (response.body != "")
         log(LogType::Warn, "Only one message is intended - the first content "
                            "header applies to both");
-    bodyBuffer += body;
-    type = "text/plain";
-    responseStatus = status;
+    response.body += body;
+    response.contentType = "text/plain";
+    response.status = status;
 }
 void HttpConnection::string(std::string body) {
     string(HttpResponse::StatusCodes::OK, body);
 }
 
 void HttpConnection::json(int status, std::string jsonBody) {
-    if (bodyBuffer != "")
+    if (response.body != "")
         log(LogType::Warn, "Only one message is intended - the first content "
                            "header applies to both");
-    bodyBuffer += jsonBody;
-    type = "application/json";
-    responseStatus = static_cast<HttpResponse::StatusCodes>(status);
+    response.body += jsonBody;
+    response.contentType = "application/json";
+    response.status = static_cast<HttpResponse::StatusCodes>(status);
 }
 void HttpConnection::json(HttpResponse::StatusCodes status,
                           std::string jsonBody) {
-    if (bodyBuffer != "")
+    if (response.body != "")
         log(LogType::Warn, "Only one message is intended - the first content "
                            "header applies to both");
-    bodyBuffer += jsonBody;
-    type = "application/json";
-    responseStatus = status;
+    response.body += jsonBody;
+    response.contentType = "application/json";
+    response.status = status;
 }
 void HttpConnection::json(std::string jsonBody) {
     json(HttpResponse::StatusCodes::OK, jsonBody);
 }
 
 void HttpConnection::status(int status) {
-    responseStatus = static_cast<HttpResponse::StatusCodes>(status);
+    response.status = static_cast<HttpResponse::StatusCodes>(status);
 }
 void HttpConnection::status(HttpResponse::StatusCodes status) {
-    responseStatus = status;
+    response.status = status;
 }
 
 void HttpConnection::data(std::string type, int status, std::string body) {
-    if (bodyBuffer != "")
+    if (response.body != "")
         log(LogType::Warn, "Only one message is intended - the first content "
                            "header applies to both");
-    bodyBuffer += body;
-    this->type = type;
-    responseStatus = static_cast<HttpResponse::StatusCodes>(status);
+    response.body += body;
+    response.contentType = type;
+    response.status = static_cast<HttpResponse::StatusCodes>(status);
 }
 void HttpConnection::data(std::string type, HttpResponse::StatusCodes status,
                           std::string body) {
-    if (bodyBuffer != "")
+    if (response.body != "")
         log(LogType::Warn, "Only one message is intended - the first content "
                            "header applies to both");
-    bodyBuffer += body;
-    this->type = type;
-    responseStatus = status;
+    response.body += body;
+    response.contentType = type;
+    response.status = status;
 }
 void HttpConnection::data(std::string type, std::string body) {
     data(type, HttpResponse::StatusCodes::OK, body);
 }
 
 void HttpConnection::header(std::string hName, std::string hContent) {
-    responseHeaders[hName] = hContent;
+    response.headers[hName] = hContent;
 }
 
 // Buffer for messages
-void HttpConnection::sendBuffer(std::string type,
-                                HttpResponse::StatusCodes status) {
-    HttpResponse response(status, bodyBuffer, type);
-    // Inject headers
-    for (const auto &header : responseHeaders) {
-        response.setHeader(header.first, header.second);
-    }
+void HttpConnection::sendBuffer() {
     std::string http = response.toHttpString();
-
     send(client, http.c_str(), http.size(), 0);
 }
-
-void HttpConnection::sendBuffer() { sendBuffer(type, responseStatus); }
 
 // Middleware
 // Used to set the next middleware for the HttpConnection from HttpServer
@@ -203,7 +197,7 @@ void HttpConnection::next() {
 // Receive client data (POST etc.)
 std::string HttpConnection::defaultPostForm(std::string clientString,
                                             std::string defaultString) {
-    if (method == "GET") {
+    if (response.method == "GET") {
         return defaultString;
     }
 
@@ -211,9 +205,9 @@ std::string HttpConnection::defaultPostForm(std::string clientString,
     // because there is no '&')
     int start = 0;
     int end;
-    while ((end = clientBuffer.find('&', start)) != std::string::npos) {
+    while ((end = response.body.find('&', start)) != std::string::npos) {
         // Get whole argument substring
-        std::string parameter = clientBuffer.substr(start, end - start);
+        std::string parameter = response.body.substr(start, end - start);
         int equalPos = parameter.find('=');
         if (equalPos != std::string::npos) {
             // Get substring of everything before and after '='
@@ -229,7 +223,7 @@ std::string HttpConnection::defaultPostForm(std::string clientString,
 
     // Redo that for the last argument that was skipped before
     // Get whole argument substring
-    std::string lastParameter = clientBuffer.substr(start);
+    std::string lastParameter = response.body.substr(start);
     int equalPos = lastParameter.find('=');
     if (equalPos != std::string::npos) {
         // Get substring of everything before and after '='
@@ -255,9 +249,9 @@ std::string HttpConnection::query(std::string clientString) {
     // because there is no '&')
     int start = 0;
     int end;
-    while ((end = clientQuery.find('&', start)) != std::string::npos) {
+    while ((end = request.rawQuery.find('&', start)) != std::string::npos) {
         // Get whole argument substring
-        std::string parameter = clientQuery.substr(start, end - start);
+        std::string parameter = request.rawQuery.substr(start, end - start);
         int equalPos = parameter.find('=');
         if (equalPos != std::string::npos) {
             // Get substring of everything before and after '='
@@ -273,7 +267,7 @@ std::string HttpConnection::query(std::string clientString) {
 
     // Redo that for the last argument that was skipped before
     // Get whole argument substring
-    std::string lastParameter = clientQuery.substr(start);
+    std::string lastParameter = request.rawQuery.substr(start);
     int equalPos = lastParameter.find('=');
     if (equalPos != std::string::npos) {
         // Get substring of everything before and after '='
@@ -290,19 +284,11 @@ std::string HttpConnection::query(std::string clientString) {
 }
 
 std::string HttpConnection::param(std::string clientParam) {
-    auto it = clientParams.find(clientParam);
-    if (it != clientParams.end()) {
-        return it->second;
-    }
-    return "";
+    return request.param(clientParam);
 }
 
 std::string HttpConnection::getHeader(std::string clientHeader) {
-    auto it = clientHeaders.find(clientHeader);
-    if (it != clientHeaders.end()) {
-        return it->second;
-    }
-    return "";
+    return request.header(clientHeader);
 }
 
 void HttpConnection::redirect(std::string endpoint) {
@@ -312,9 +298,24 @@ void HttpConnection::redirect(std::string endpoint) {
     close(client);
 }
 
-void HttpConnection::setMethod(std::string method) { this->method = method; }
+void HttpConnection::redirect(vesper::HttpResponse::StatusCodes statuscode,
+                              std::string endpoint) {
+    status(statuscode);
+    header("Location", endpoint);
+    sendBuffer();
+    close(client);
+}
+
+void HttpConnection::redirect(int statuscode, std::string endpoint) {
+    status(static_cast<int>(statuscode));
+    header("Location", endpoint);
+    sendBuffer();
+    close(client);
+}
+
+void HttpConnection::setMethod(std::string method) { response.method = method; }
 
 void HttpConnection::setClientBuffer(std::string clientBuffer) {
-    this->clientBuffer = clientBuffer;
+    response.body = clientBuffer;
 }
 } // namespace vesper

@@ -2,7 +2,11 @@
 #include "../include/http/radixTree.h"
 #include "../include/tcp/TcpServer.h"
 
-namespace vesper { // HTTP-SERVER
+namespace vesper {
+// ===========
+// HTTP-SERVER
+// ===========
+
 HttpServer::HttpServer() : TcpServer() {}
 
 // Close server automatically
@@ -71,7 +75,7 @@ void HttpServer::onClient(int client) {
 
     // Parse remaining headers
     log(LogType::Debug, "Parse remaining headers");
-    connection.clientHeaders = parseHeaders(buffer.data(), buffer.size());
+    connection.request.headers = parseHeaders(buffer.data(), buffer.size());
 
     // Get Body for POST requests
     // Skip the "\r\n\r\n"
@@ -126,13 +130,13 @@ void HttpServer::onClient(int client) {
         header = request.substr(0, headerEnd);
     }
     log(LogType::Debug, "Save headers");
-    connection.clientHeader = header;
+    connection.request.rawHeaders = header;
     log(LogType::Debug, "Save method");
-    connection.clientMethod = std::string(method);
+    connection.request.method = std::string(method);
     log(LogType::Debug, "Save endpoint");
-    connection.clientEndpoint = clientEndpoint;
+    connection.request.path = clientEndpoint;
     log(LogType::Debug, "Save version");
-    connection.clientHttpVersion = version;
+    connection.request.httpVersion = version;
     bool handled = false;
 
     // Adjust clientEndpoint given to the handlers so querys are disregarded
@@ -149,7 +153,7 @@ void HttpServer::onClient(int client) {
                       path.c_str());
         endpointStr = path;
         log(LogType::Debug, "Save query");
-        connection.clientQuery = decodeURL(query);
+        connection.request.rawQuery = decodeURL(query);
     }
 
     log(LogType::Debug, "Get URL params");
@@ -160,7 +164,7 @@ void HttpServer::onClient(int client) {
         pair.second = decodeURL(pair.second);
     }
     log(LogType::Debug, "Save parameters map");
-    connection.clientParams = parameterMap;
+    connection.request.params = parameterMap;
 
     // MiddleWare / All Handlers
     log(LogType::Debug, "Run Middleware Chain");

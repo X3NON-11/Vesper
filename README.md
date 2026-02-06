@@ -6,7 +6,7 @@
 </div>
 
   
-# Key Features
+# Features
 - start a server
 - send plain text, json, etc.
 - endpoints
@@ -15,6 +15,8 @@
 - querys
 - URL parameters
 - get client headers (e.g. Auth Headers)
+- router groups
+- redirects
 
 # How to use
 ```c++
@@ -71,7 +73,7 @@ include(FetchContent)
 FetchContent_Declare(
   vesper
   GIT_REPOSITORY https://github.com/DieOlive/Vesper
-  GIT_TAG prerelease_0.942
+  GIT_TAG prerelease_0.95
 )
 
 FetchContent_MakeAvailable(vesper)
@@ -122,4 +124,17 @@ std::string message = c.param("test");
 Useful for Auth Headers etc. Can be use with the getHeader() function which takes in the header name and gives back the content
 ```C++
 std::string message = c.getHeader("message");
+```
+
+**Router Grous**  
+Useful when you want to set a middleware for all endpoints beneath another. When for example given the endpoint /test it lets you set middleware for all endpoints beneath using g.use(middleware) or create new endpoints with g.GET("/example", handler) leading to the creation of the endpoint /test/example
+```C++
+vesper::Router g = server.group("/test");
+
+```
+
+**Redirects**  
+Can be for example used when autherization failed and you want to send the user to the home page. Then you can use c.redirect("/") to redirect him
+```C++
+c.redirect("/");
 ```
