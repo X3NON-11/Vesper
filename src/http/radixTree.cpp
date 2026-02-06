@@ -1,5 +1,9 @@
 #include "../include/http/radixTree.h"
 
+// ==========
+// Radix Tree
+// ==========
+
 Tree::Tree() {
     root = std::make_unique<Node>();
     root->segment = "/";

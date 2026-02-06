@@ -1,5 +1,9 @@
 #include "../include/utils/urlEncoding.h"
 
+// ============
+// URL Encoding
+// ============
+
 std::string decodeURL(std::string &url) {
     std::ostringstream decoded;
     decoded.fill('0');

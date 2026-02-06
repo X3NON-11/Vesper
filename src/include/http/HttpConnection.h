@@ -94,38 +94,65 @@ namespace vesper {
             StatusCodes status;
             std::string body;
             std::string contentType;
+            std::string method;
             std::unordered_map<std::string, std::string> headers;
 
-            HttpResponse(StatusCodes status, std::string body, std::string type);
+            HttpResponse(StatusCodes status, std::string body, std::string type, std::string method);
             std::string toHttpString();
             void setHeader(const std::string& name, const std::string& value);
             void removeHeader(std::string& name);
         private:
             std::string statusToString(StatusCodes status);
     };
+    
+    // Used to store all details about the client request
+    class HttpRequest {
+        public:
+            // Core HTTP
+            std::string method;
+            std::string path;
+            std::string httpVersion;
+        
+            // Query & params
+            std::string rawQuery;
+            std::unordered_map<std::string, std::string> query;
+            std::unordered_map<std::string, std::string> params;
+        
+            // Headers & body
+            std::string rawHeaders;
+            std::unordered_map<std::string, std::string> headers;
+            std::string body;
+        
+            // Abstractions for convenience
+            std::string header(std::string name) {
+                auto it = headers.find(std::string(name));
+                return it != headers.end() ? it->second : "";
+            }
+        
+            std::string param(std::string name) {
+                auto it = params.find(std::string(name));
+                return it != params.end() ? it->second : "";
+            }
+        
+            std::string queryParam(std::string name) {
+                auto it = query.find(std::string(name));
+                return it != query.end() ? it->second : "";
+            }
+        };
 
-        // Stores all the http abstractions / what you would access as a library user (e.g c.string("Hello World"); )
+    // Stores all the http abstractions / what you would access as a library user (e.g c.string("Hello World"); )
     class HttpConnection {
         private:
             vesper::HttpServer* server;
             int client;
-
-            HttpResponse::StatusCodes responseStatus;
-            std::string clientBuffer; // Used for POST (etc.) requests
-            std::string bodyBuffer;
-            std::string type;
-            std::string method;
-            std::unordered_map<std::string, std::string> responseHeaders;
             std::function<void()> nextFn;
 
         public:
-            std::string clientHeader;
-            std::string clientEndpoint;
-            std::string clientMethod;
-            std::string clientHttpVersion;
-            std::string clientQuery;
-            std::unordered_map<std::string, std::string> clientParams; // 1.String: paramName 2.String: content
-            std::unordered_map<std::string, std::string> clientHeaders; // 1.String: headerName 2.String: content
+            // Stores all information about the request (from the client)
+            HttpRequest request;
+            // How the user can access all response internal variables/functions
+            HttpResponse response{HttpResponse::StatusCodes::OK, "", "text/plain", "GET"};
+
 
             explicit HttpConnection(int client, vesper::HttpServer *server);
 
@@ -135,6 +162,8 @@ namespace vesper {
             void sendBuffer(); // Sends all cashed responses together
             void sendBuffer(std::string type, HttpResponse::StatusCodes status);
             void redirect(std::string endpoint);
+            void redirect(vesper::HttpResponse::StatusCodes statuscode, std::string endpoint);
+            void redirect(int statuscode, std::string endpoint);
 
             // Abstractions for convenience (only calls data())
             void string(int status, std::string body);

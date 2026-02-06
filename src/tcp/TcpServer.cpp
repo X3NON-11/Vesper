@@ -1,6 +1,10 @@
 #include "../include/tcp/TcpServer.h"
 
-namespace vesper { // TCP-SERVER
+namespace vesper {
+// ==========
+// TCP-SERVER
+// ==========
+
 // Automatically clean up when closing
 TcpServer::~TcpServer() {
     closeServer();
