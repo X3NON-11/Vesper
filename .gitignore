@@ -68,3 +68,11 @@ vcpkg_installed/
 Testing/
 .cache/
 
+# FetchContent / External deps
+**/_deps/
+**/_deps/**
+
+# CMake external projects
+**/*-prefix/
+**/*-src/
+**/*-subbuild/
