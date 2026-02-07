@@ -1,7 +1,0 @@
-/home/xenon/PROJECTS/cpp/vesper/examples/example1/build/CMakeFiles/example1.dir
-/home/xenon/PROJECTS/cpp/vesper/examples/example1/build/CMakeFiles/edit_cache.dir
-/home/xenon/PROJECTS/cpp/vesper/examples/example1/build/CMakeFiles/rebuild_cache.dir
-/home/xenon/PROJECTS/cpp/vesper/examples/example1/build/_deps/vesper-build/CMakeFiles/vesper.dir
-/home/xenon/PROJECTS/cpp/vesper/examples/example1/build/_deps/vesper-build/CMakeFiles/vesper-app.dir
-/home/xenon/PROJECTS/cpp/vesper/examples/example1/build/_deps/vesper-build/CMakeFiles/edit_cache.dir
-/home/xenon/PROJECTS/cpp/vesper/examples/example1/build/_deps/vesper-build/CMakeFiles/rebuild_cache.dir
