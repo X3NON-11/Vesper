@@ -62,25 +62,25 @@ inline void log(LogType type, const std::string& message) {
     switch (type) {
         case LogType::Error:
             color = RED;
-            output = dt + " [ERROR] " + message;
+            output = "[ERROR] " + dt + " | " +  message;
             std::cerr << color << output << RESET << std::endl;
             if (file.is_open()) file << output << '\n';
             exit(1);
         case LogType::Warn:
             if (ignoreWarnings) return;
             color = YELLOW;
-            output = dt + " [WARN]  " + message;
+            output = "[WARN] " + dt + " | " +  message;
             std::cout << color << output << RESET << std::endl;
             if (file.is_open()) file << output << '\n';
             break;
         case LogType::Info:
-            output = dt + " [INFO]  " + message;
+            output = "[INFO] " + dt + " | " +  message;
             std::cout << output <<  std::endl;
             if (file.is_open()) file << output << '\n';
             break;
         case LogType::Debug:
             color = BLUE;
-            output = dt + " [DEBUG] " + message;
+            output = "[DEBUG] " + dt + " | " +  message;
             std::cout << color << output << RESET << std::endl;
             if (file.is_open()) file << output << '\n';
             break;

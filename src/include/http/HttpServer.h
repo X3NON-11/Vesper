@@ -128,7 +128,7 @@ namespace vesper {
                 std::vector<std::function<void(HttpConnection&)>> chain = { std::forward<Handlers>(handlers)...};
                 for (int i = 0; i < chain.size(); i++) {
                     middlewares.push_back(std::move(chain[i]));
-                    log(LogType::Info, "ALL /");
+                    log(LogType::Info, "ALL " + prefix);
                 }
             }
         
