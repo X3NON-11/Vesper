@@ -8,6 +8,8 @@
 #include <functional>       // std::function
 #include <string>           // std::string::npos
 #include <thread>           // multithreading for different clients
+#include <fcntl.h>          // fcntl make recv non blocking
+#include <vector>           // Used for storing the client buffer
 
 #include "../utils/logging.h"        // My own logging library/header
 #include "../http/HttpConnection.h"
@@ -35,5 +37,10 @@ namespace vesper {
             int startServer(std::string ipAddress, int port);
             // closes socket (is run in the TcpServer destructor)
             void closeServer(); 
+            
+            // Functions that use Linux only functions
+            bool setSocketNonBlocking(int client);
+            bool receiveRequest(int client, std::string &request, std::vector<char> &buffer);
+            bool receivePostData(int client, std::vector<char> &buffer, std::string postData, int timeout, int contentLength);
     };
 }

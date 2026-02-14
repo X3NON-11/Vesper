@@ -73,8 +73,6 @@ void TcpServer::runServer() {
         }
 
         threads.newTask([this, client]() { onClient(client); });
-        //        std::thread callback(&TcpServer::onClient, this, client);
-        //        callback.detach();
     }
 }
 
@@ -86,4 +84,80 @@ void TcpServer::onClient(int client) {
     send(client, message, strlen(message), 0);
     close(client);
 }
+
+// Functions that use Linux only functions
+bool TcpServer::setSocketNonBlocking(int client) {
+    int flags = fcntl(client, F_GETFL, 0);
+    if (flags == -1) {
+        log(LogType::Warn, "fcntl F_GETFL");
+        return false;
+    }
+
+    if (fcntl(client, F_SETFL, flags | O_NONBLOCK) == -1) {
+        log(LogType::Warn, "fcntl F_SETFL");
+        return false;
+    }
+
+    return true;
+}
+
+bool TcpServer::receiveRequest(int client, std::string &request,
+                               std::vector<char> &buffer) {
+    while (request.find("\r\n\r\n") == std::string::npos) {
+        int r = recv(client, buffer.data(), buffer.size(), 0);
+        if (r > 0) {
+            request.append(buffer.data(), r);
+        } else if (r == 0) {
+            log(LogType::Warn, "Client closed connection");
+            return false;
+        } else { // r < 0
+            if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                // no data yet -> wait a little, then retry
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                continue;
+            } else {
+                log(LogType::Warn, "recv error");
+                return false;
+            }
+        }
+
+        // Prevent header abuse
+        if (request.size() > 16 * 1024) {
+            log(LogType::Warn, "HTTP headers too large");
+            return false;
+        }
+    }
+    return true;
+}
+bool TcpServer::receivePostData(int client, std::vector<char> &buffer,
+                                std::string postData, int timeout,
+                                int contentLength) {
+    auto start = std::chrono::steady_clock::now();
+    while (postData.size() < contentLength) {
+        int r = recv(client, buffer.data(), buffer.size(), 0);
+        if (r > 0) {
+            postData.append(buffer.data(), r);
+        } else if (r == 0) {
+            log(LogType::Warn, "Client closed during body");
+            return false;
+        } else {
+            if (errno == EAGAIN ||
+                errno == EWOULDBLOCK) { // Not a timeout — just no data yet
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            } else {
+                log(LogType::Warn, "recv error");
+                return false;
+            }
+        }
+
+        auto now = std::chrono::steady_clock::now();
+        if (std::chrono::duration_cast<std::chrono::seconds>(now - start)
+                .count() > timeout) {
+            log(LogType::Warn, "Client took too long to send body");
+            return false;
+        }
+    }
+    return true;
+}
+
 } // namespace vesper

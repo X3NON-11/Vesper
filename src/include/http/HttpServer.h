@@ -2,7 +2,6 @@
 
 #include <algorithm>        // std::remove_if
 #include <netinet/tcp.h>    // Set timeout
-#include <fcntl.h>          // fcntl make recv non blocking
 
 #include "../utils/logging.h"        // My own logging library/header
 #include "../http/radixTree.h"      // Used for the tries that saves all the endpoints and middlewares
@@ -20,6 +19,7 @@ namespace vesper {
             HttpServer();
             ~HttpServer();
             void run(std::string ipAddress, int port); // Runs startServer & runServer on a different thread
+            int timeout = 2;
             // Groups together endpoints/middleware
             vesper::Router group(std::string endpoint);
 

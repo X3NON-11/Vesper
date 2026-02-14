@@ -30,49 +30,17 @@ void HttpServer::onClient(int client) {
     // Create the object that gets access by the library user
     HttpConnection connection(client, this);
 
-    int flags = fcntl(client, F_GETFL, 0);
-    if (flags == -1) {
-        perror("fcntl F_GETFL");
-        close(client);
-        return;
-    }
-
-    if (fcntl(client, F_SETFL, flags | O_NONBLOCK) == -1) {
-        perror("fcntl F_SETFL");
+    if (!setSocketNonBlocking(client)) {
         close(client);
         return;
     }
     // Getting what endpoint, method client has/wants to later run the correct
     // handler Receive data from client;
-
     std::string request;
     std::vector<char> buffer(4096);
-    while (request.find("\r\n\r\n") == std::string::npos) {
-        int r = recv(client, buffer.data(), buffer.size(), 0);
-        if (r > 0) {
-            request.append(buffer.data(), r);
-        } else if (r == 0) {
-            log(LogType::Warn, "Client closed connection");
-            close(client);
-            return;
-        } else { // r < 0
-            if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                // no data yet -> wait a little, then retry
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                continue;
-            } else {
-                log(LogType::Warn, "recv error");
-                close(client);
-                return;
-            }
-        }
-
-        // Prevent header abuse
-        if (request.size() > 16 * 1024) {
-            log(LogType::Warn, "HTTP headers too large");
-            close(client);
-            return;
-        }
+    if (!receiveRequest(client, request, buffer)) {
+        close(client);
+        return;
     }
 
     // Parse http data
@@ -109,34 +77,9 @@ void HttpServer::onClient(int client) {
 
     // Save the body to postData
     std::string postData = body;
-    auto start = std::chrono::steady_clock::now();
-    const int maxTotalSeconds = 2;
-    while (postData.size() < contentLength) {
-        int r = recv(client, buffer.data(), buffer.size(), 0);
-        if (r > 0) {
-            postData.append(buffer.data(), r);
-        } else if (r == 0) {
-            log(LogType::Warn, "Client closed during body");
-            close(client);
-            return;
-        } else {
-            if (errno == EAGAIN ||
-                errno == EWOULDBLOCK) { // Not a timeout — just no data yet
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            } else {
-                log(LogType::Warn, "recv error");
-                close(client);
-                return;
-            }
-        }
-
-        auto now = std::chrono::steady_clock::now();
-        if (std::chrono::duration_cast<std::chrono::seconds>(now - start)
-                .count() > maxTotalSeconds) {
-            log(LogType::Warn, "Client took too long to send body");
-            close(client);
-            return;
-        }
+    if (!receivePostData(client, buffer, postData, timeout, contentLength)) {
+        close(client);
+        return;
     }
 
     connection.setClientBuffer(postData);
