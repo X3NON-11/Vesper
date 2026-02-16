@@ -29,14 +29,14 @@ namespace vesper {
             virtual ~TcpServer(); // Allows overide for subclasses (HttpServer)
 
             // Listens for new connections (clients)
-            void runServer(); 
+            void runServer();
             // Logic on connection (overwritten in HttpServer)
-            virtual void onClient(int client); 
+            virtual void onClient(int client);
 
             // sets everything up for a basic Tcp Server
             int startServer(std::string ipAddress, int port);
             // closes socket (is run in the TcpServer destructor)
-            void closeServer(); 
+            void closeServer();
             
             // Functions that use Linux only functions
             bool setSocketNonBlocking(int client);

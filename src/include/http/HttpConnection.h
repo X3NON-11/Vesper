@@ -119,7 +119,6 @@ namespace vesper {
             std::unordered_map<std::string, std::string> params;
         
             // Headers & body
-            std::string rawHeaders;
             std::unordered_map<std::string, std::string> headers;
             std::string body;
         

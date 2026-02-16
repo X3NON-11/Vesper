@@ -30,82 +30,89 @@ void HttpServer::onClient(int client) {
     // Create the object that gets access by the library user
     HttpConnection connection(client, this);
 
-    if (!setSocketNonBlocking(client)) {
-        close(client);
-        return;
-    }
+    struct Context {
+        std::string request;
+        std::vector<char> buffer;
+        char method[10]{};
+        char clientEndpoint[256]{};
+        char version[10]{};
+        int contentLength = 0;
+        int headerEnd = -1;
+        std::string body;
+        std::string postData;
+        std::string endpointStr;
+    };
+    Context ctx{};
+    ctx.buffer.resize(4096);
+
     // Getting what endpoint, method client has/wants to later run the correct
     // handler Receive data from client;
-    std::string request;
-    std::vector<char> buffer(4096);
-    if (!receiveRequest(client, request, buffer)) {
+    if (!receiveRequest(client, ctx.request, ctx.buffer)) {
         close(client);
         return;
     }
 
     // Parse http data
-    char method[10], clientEndpoint[256], version[10];
-    if (sscanf(request.data(), "%s %s %s", method, clientEndpoint, version) !=
+    if (sscanf(ctx.request.data(), "%s %s %s", ctx.method, ctx.clientEndpoint,
+               ctx.version) !=
         3) { // https://cplusplus.com/reference/cstdio/sscanf/
         log(LogType::Warn, "Failed to parse http request");
     }
 
     // Skip Website Logo if client connected with a browser
-    if (strcmp(clientEndpoint, "/favicon.ico") == 0) {
+    if (strcmp(ctx.clientEndpoint, "/favicon.ico") == 0) {
         close(client);
         return;
     }
 
     // Parse remaining headers
-    connection.request.headers = parseHeaders(request.data(), request.size());
+    connection.request.headers =
+        parseHeaders(ctx.request.data(), ctx.request.size());
 
     // Get the content length
-    int contentLength = 0;
-    char *cl = strstr(request.data(), "Content-Length:");
+    ctx.contentLength = 0;
+    char *cl = strstr(ctx.request.data(), "Content-Length:");
     if (cl) {
-        sscanf(cl, "Content-Length: %d", &contentLength);
+        sscanf(cl, "Content-Length: %d", &ctx.contentLength);
     }
 
     // Find end of headers
-    std::string header = "";
-    int headerEnd = request.find("\r\n\r\n");
-    std::string headers = request.substr(0, headerEnd);
-    std::string body;
-    if (headerEnd + 4 < request.size()) {
-        body = request.substr(headerEnd + 4);
+    ctx.headerEnd = ctx.request.find("\r\n\r\n");
+    if (ctx.headerEnd + 4 < ctx.request.size()) {
+        ctx.body = ctx.request.substr(ctx.headerEnd + 4);
     }
 
     // Save the body to postData
-    std::string postData = body;
-    if (!receivePostData(client, buffer, postData, timeout, contentLength)) {
+    ctx.postData = ctx.body;
+    if (!receivePostData(client, ctx.buffer, ctx.postData, timeout,
+                         ctx.contentLength)) {
         close(client);
         return;
     }
 
-    connection.setClientBuffer(postData);
-    connection.request.rawHeaders = header;
-    connection.request.method = std::string(method);
-    connection.request.path = clientEndpoint;
-    connection.request.httpVersion = version;
+    connection.setClientBuffer(ctx.postData);
+    connection.request.method = std::string(ctx.method);
+    connection.request.path = ctx.clientEndpoint;
+    connection.request.httpVersion = ctx.version;
     bool handled = false;
 
     // Adjust clientEndpoint given to the handlers so querys are
     // disregarded
-    std::string endpointStr(clientEndpoint);
-    auto pos = endpointStr.find('?');
+    ctx.endpointStr = std::string(ctx.clientEndpoint);
+    auto pos = ctx.endpointStr.find('?');
     if (pos != std::string::npos) {
         // First get position to avoid std::out_of_range
-        std::string path = endpointStr.substr(0, pos);
-        std::string query = endpointStr.substr(pos + 1);
+        std::string path = ctx.endpointStr.substr(0, pos);
+        std::string query = ctx.endpointStr.substr(pos + 1);
 
-        std::snprintf(clientEndpoint, sizeof(clientEndpoint), "%s",
+        std::snprintf(ctx.clientEndpoint, sizeof(ctx.clientEndpoint), "%s",
                       path.c_str());
-        endpointStr = path;
+        ctx.endpointStr = path;
         connection.request.rawQuery = decodeURL(query);
     }
 
     std::unordered_map<std::string, std::string> parameterMap =
-        endpointsTree.getUrlParams(endpointStr, std::string(method));
+        endpointsTree.getUrlParams(ctx.endpointStr, std::string(ctx.method));
     for (auto &pair : parameterMap) {
         pair.second = decodeURL(pair.second);
     }
@@ -113,11 +120,12 @@ void HttpServer::onClient(int client) {
 
     // MiddleWare / All Handlers
     std::vector<std::function<void(HttpConnection &)>> middlewares;
-    middlewareTree.collectPrefixHandlers(endpointStr, method, middlewares);
+    middlewareTree.collectPrefixHandlers(ctx.endpointStr, ctx.method,
+                                         middlewares);
 
     runMiddlewareChain(connection, middlewares, 0, [&]() {
-        if (endpointsTree.matchURL(endpointStr, method)) {
-            auto h = endpointsTree.getNodeHandler(endpointStr, method);
+        if (endpointsTree.matchURL(ctx.endpointStr, ctx.method)) {
+            auto h = endpointsTree.getNodeHandler(ctx.endpointStr, ctx.method);
             if (h) {
                 h(connection);
                 handled = true;

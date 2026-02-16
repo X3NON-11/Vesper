@@ -62,7 +62,7 @@ int TcpServer::startServer(std::string ipAddress, int port) {
     return 0;
 }
 
-// Should run multithreaded (HttpServer does that)
+// Runs in HttpServer
 void TcpServer::runServer() {
     // Infinitly accepts new clients on socket and forwards them by executing
     // onClient()
@@ -70,6 +70,11 @@ void TcpServer::runServer() {
         int client = accept(listenSocket, nullptr, nullptr);
         if (client < 0) {
             log(LogType::Error, "Couldn't accept client");
+        }
+
+        if (!setSocketNonBlocking(client)) {
+            close(client);
+            return;
         }
 
         threads.newTask([this, client]() { onClient(client); });
@@ -129,6 +134,7 @@ bool TcpServer::receiveRequest(int client, std::string &request,
     }
     return true;
 }
+
 bool TcpServer::receivePostData(int client, std::vector<char> &buffer,
                                 std::string postData, int timeout,
                                 int contentLength) {
