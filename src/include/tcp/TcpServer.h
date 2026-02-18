@@ -35,10 +35,10 @@ namespace vesper {
             virtual ~TcpServer(); // Allows overide for subclasses (HttpServer)
 
             // Listens for new connections (clients)
-            void runServer();
-            // async::Task runServer();
+            // void runServer();
+            async::Task runServer();
             // Logic on connection (overwritten in HttpServer)
-            virtual void onClient(int client);
+            virtual async::Task onClient(int client);
 
             // sets everything up for a basic Tcp Server
             int startServer(std::string ipAddress, int port);
@@ -47,7 +47,5 @@ namespace vesper {
             
             // Functions that use Linux only functions
             bool setSocketNonBlocking(int client);
-            bool receiveRequest(int client, std::string &request, std::vector<char> &buffer);
-            bool receivePostData(int client, std::vector<char> &buffer, std::string postData, int timeout, int contentLength);
     };
 }

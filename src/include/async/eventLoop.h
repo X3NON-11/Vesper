@@ -24,6 +24,17 @@ public:
         epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev);
     }
 
+    void watchWrite(int fd, std::coroutine_handle<> h) {
+        epoll_event ev{};
+        ev.events = EPOLLOUT | EPOLLET;
+        ev.data.ptr = h.address();
+        int ret = epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev);
+        
+        if (ret < 0) {
+            log(LogType::Warn, "epoll_ctl watchWrite");
+        }
+    }
+    
     void loop() {
         while (true) {
             int n = epoll_wait(epfd, events, MAX_EVENTS, -1);

@@ -23,10 +23,11 @@ void HttpServer::run(std::string ipAddress, int port) {
         ipAddress = "127.0.0.1";
     startServer(ipAddress, port);
     serverThread = std::thread(&TcpServer::runServer, this);
+    async::EventLoop::instance().loop();
 }
 
 // Decides when & at what endpoint to run the handlers
-void HttpServer::onClient(int client) {
+async::Task HttpServer::onClient(int client) {
     // Create the object that gets access by the library user
     HttpConnection connection(client, this);
     Context ctx{};
@@ -34,36 +35,79 @@ void HttpServer::onClient(int client) {
 
     // Getting what endpoint, method client has/wants to later run the correct
     // handler Receive data from client;
-    if (!receiveClientRequest(client, ctx)) {
-        // Specific logs already handled
-        close(client);
-        return;
+    while (ctx.request.find("\r\n\r\n") == std::string::npos) {
+        // int r = recv(client, buffer.data(), buffer.size(), 0);
+        int r = co_await async::RecvAwaiter{client, ctx.buffer.data(),
+                                            ctx.buffer.size()};
+        if (r > 0) {
+            ctx.request.append(ctx.buffer.data(), r);
+        } else if (r == 0) {
+            log(LogType::Warn, "Client closed connection");
+            close(client);
+            co_return;
+        } else { // r < 0
+            log(LogType::Warn, "recv error");
+            co_return;
+        }
+
+        // Prevent header abuse
+        if (ctx.request.size() > 16 * 1024) {
+            log(LogType::Warn, "HTTP headers too large");
+            close(client);
+            co_return;
+        }
     }
+
     // Parse http data
-    if (!parseRequestLine(ctx)) {
-        log(LogType::Warn, "Failed to parse http request");
+    parseRequestLine(ctx);
+    if (!ctx.error.empty()) {
+        log(LogType::Warn, ctx.error);
         close(client);
-        return;
+        co_return;
     }
+
     // Skip Website Logo if client connected with a browser
-    if (shouldCloseConnection(ctx)) {
+    shouldCloseConnection(ctx);
+    if (!ctx.error.empty()) {
         // No logs because would be annoying to log this
         close(client);
-        return;
+        co_return;
     }
+
     // Parse remaining headers
     connection.request.headers =
         parseHeaders(ctx.request.data(), ctx.request.size());
+
     // Get the content length
     getContentLength(ctx);
     // Find end of headers
     parseHeadersAndBody(ctx);
     // Save the body to postData
-    if (!fetchPostData(client, ctx)) {
-        // Specific error is already logged
-        close(client);
-        return;
+    ctx.postData = ctx.body;
+    auto start = std::chrono::steady_clock::now();
+    while (ctx.postData.size() < ctx.contentLength) {
+        int r = co_await async::RecvAwaiter{client, ctx.buffer.data(),
+                                            ctx.buffer.size()};
+        if (r > 0) {
+            ctx.postData.append(ctx.buffer.data(), r);
+        } else if (r == 0) {
+            log(LogType::Warn, "Client closed during body");
+            close(client);
+            co_return;
+        } else {
+            log(LogType::Warn, "recv error");
+            co_return;
+        }
+
+        auto now = std::chrono::steady_clock::now();
+        if (std::chrono::duration_cast<std::chrono::seconds>(now - start)
+                .count() > timeout) {
+            log(LogType::Warn, "Client took too long to send body");
+            close(client);
+            co_return;
+        }
     }
+
     // Saves all the variables to connection
     populateConnection(connection, ctx);
     // Adjust clientEndpoint given to the handlers so querys are
@@ -74,32 +118,32 @@ void HttpServer::onClient(int client) {
     // Run Middlewares and handler
     handleRequest(connection, ctx);
     // Close connection and logs
-    finalizeRequest(connection, client);
-}
-
-// Getting what endpoint, method client has/wants to later run the correct
-// handler Receive data from client;
-bool HttpServer::receiveClientRequest(int client, Context &ctx) {
-    return receiveRequest(client, ctx.request, ctx.buffer);
+    std::string http = connection.response.toHttpString();
+    send(client, http.c_str(), http.size(), 0);
+    close(client);
+    logConnection(static_cast<int>(connection.response.status),
+                  connection.response.method, connection.request.path);
+    co_return;
 }
 
 // https://cplusplus.com/reference/cstdio/sscanf/
-bool HttpServer::parseRequestLine(Context &ctx) {
-    return sscanf(ctx.request.data(), "%s %s %s", ctx.method,
-                  ctx.clientEndpoint, ctx.version) == 3;
+void HttpServer::parseRequestLine(Context &ctx) {
+    if (sscanf(ctx.request.data(), "%s %s %s", ctx.method, ctx.clientEndpoint,
+               ctx.version) != 3)
+        ctx.error = "Failed to parse http request";
 }
 
 // Skip Website Logo if client connected with a browser
-bool HttpServer::shouldCloseConnection(Context &ctx) {
-    return strcmp(ctx.clientEndpoint, "/favicon.ico") == 0;
+void HttpServer::shouldCloseConnection(Context &ctx) {
+    if (strcmp(ctx.clientEndpoint, "/favicon.ico") == 0)
+        ctx.error = "Skipped favicon.ico";
 }
 
 void HttpServer::getContentLength(Context &ctx) {
     ctx.contentLength = 0;
     char *cl = strstr(ctx.request.data(), "Content-Length:");
-    if (cl) {
+    if (cl)
         sscanf(cl, "Content-Length: %d", &ctx.contentLength);
-    }
 }
 
 // Find end of headers
@@ -109,17 +153,6 @@ void HttpServer::parseHeadersAndBody(Context &ctx) {
         ctx.headerEnd + 4 < ctx.request.size()) {
         ctx.body = ctx.request.substr(ctx.headerEnd + 4);
     }
-}
-
-// Save the body to postData
-bool HttpServer::fetchPostData(int client, Context &ctx) {
-    ctx.postData = ctx.body;
-    if (!receivePostData(client, ctx.buffer, ctx.postData, timeout,
-                         ctx.contentLength)) {
-        close(client);
-        return false;
-    }
-    return true;
 }
 
 void HttpServer::populateConnection(HttpConnection &connection, Context &ctx) {
@@ -166,7 +199,7 @@ void HttpServer::handleRequest(HttpConnection &connection, Context &ctx) {
         if (endpointsTree.matchURL(ctx.endpointStr, ctx.method)) {
             auto h = endpointsTree.getNodeHandler(ctx.endpointStr, ctx.method);
             if (h) {
-                h(connection);
+                threads.newTask([h, &connection]() { h(connection); });
                 handled = true;
             }
         }
@@ -176,12 +209,9 @@ void HttpServer::handleRequest(HttpConnection &connection, Context &ctx) {
         connection.string(404, "");
 }
 
-void HttpServer::finalizeRequest(HttpConnection &connection, int client) {
-    connection.sendBuffer();
-    close(client);
-    logConnection(static_cast<int>(connection.response.status),
-                  connection.response.method, connection.request.path);
-}
+// =============
+// onClient over
+// =============
 
 vesper::Router HttpServer::group(std::string endpoint) {
     return vesper::Router(*this, endpoint);

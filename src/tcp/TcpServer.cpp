@@ -62,27 +62,7 @@ int TcpServer::startServer(std::string ipAddress, int port) {
     return 0;
 }
 
-// Runs in HttpServer
-void TcpServer::runServer() {
-    // Infinitly accepts new clients on socket and forwards them by
-    // executing onClient()
-    while (true) {
-        int client = accept(listenSocket, nullptr, nullptr);
-        if (client < 0) {
-            log(LogType::Error, "Couldn't accept client");
-        }
-
-        if (!setSocketNonBlocking(client)) {
-            close(client);
-            return;
-        }
-
-        threads.newTask([this, client]() { onClient(client); });
-    }
-}
-/*async::Task TcpServer::runServer() {
-    vesper::async::EventLoop::instance().loop();
-
+async::Task TcpServer::runServer() {
     while (true) {
         int client = co_await async::AcceptAwaiter{listenSocket};
 
@@ -93,15 +73,16 @@ void TcpServer::runServer() {
 
         onClient(client); // starts another coroutine
     }
-}*/
+}
 
 // Just a basic placeholder
 // Is overwritten in HttpServer
-void TcpServer::onClient(int client) {
+async::Task TcpServer::onClient(int client) {
     log(LogType::Info, "Client accepted");
     const char *message = "No Handler parsed\n";
     send(client, message, strlen(message), 0);
     close(client);
+    co_return;
 }
 
 // Functions that use Linux only functions
@@ -117,66 +98,6 @@ bool TcpServer::setSocketNonBlocking(int client) {
         return false;
     }
 
-    return true;
-}
-
-bool TcpServer::receiveRequest(int client, std::string &request,
-                               std::vector<char> &buffer) {
-    while (request.find("\r\n\r\n") == std::string::npos) {
-        int r = recv(client, buffer.data(), buffer.size(), 0);
-        if (r > 0) {
-            request.append(buffer.data(), r);
-        } else if (r == 0) {
-            log(LogType::Warn, "Client closed connection");
-            return false;
-        } else { // r < 0
-            if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                // no data yet -> wait a little, then retry
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                continue;
-            } else {
-                log(LogType::Warn, "recv error");
-                return false;
-            }
-        }
-
-        // Prevent header abuse
-        if (request.size() > 16 * 1024) {
-            log(LogType::Warn, "HTTP headers too large");
-            return false;
-        }
-    }
-    return true;
-}
-
-bool TcpServer::receivePostData(int client, std::vector<char> &buffer,
-                                std::string postData, int timeout,
-                                int contentLength) {
-    auto start = std::chrono::steady_clock::now();
-    while (postData.size() < contentLength) {
-        int r = recv(client, buffer.data(), buffer.size(), 0);
-        if (r > 0) {
-            postData.append(buffer.data(), r);
-        } else if (r == 0) {
-            log(LogType::Warn, "Client closed during body");
-            return false;
-        } else {
-            if (errno == EAGAIN ||
-                errno == EWOULDBLOCK) { // Not a timeout — just no data yet
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            } else {
-                log(LogType::Warn, "recv error");
-                return false;
-            }
-        }
-
-        auto now = std::chrono::steady_clock::now();
-        if (std::chrono::duration_cast<std::chrono::seconds>(now - start)
-                .count() > timeout) {
-            log(LogType::Warn, "Client took too long to send body");
-            return false;
-        }
-    }
     return true;
 }
 } // namespace vesper

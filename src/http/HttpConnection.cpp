@@ -175,12 +175,6 @@ void HttpConnection::header(std::string hName, std::string hContent) {
     response.headers[hName] = hContent;
 }
 
-// Buffer for messages
-void HttpConnection::sendBuffer() {
-    std::string http = response.toHttpString();
-    send(client, http.c_str(), http.size(), 0);
-}
-
 // Middleware
 // Used to set the next middleware for the HttpConnection from HttpServer
 void HttpConnection::setNext(std::function<void()> fn) { nextFn = fn; }
@@ -294,7 +288,6 @@ std::string HttpConnection::getHeader(std::string clientHeader) {
 void HttpConnection::redirect(std::string endpoint) {
     status(302); // Not found
     header("Location", endpoint);
-    sendBuffer();
     close(client);
 }
 
@@ -302,14 +295,12 @@ void HttpConnection::redirect(vesper::HttpResponse::StatusCodes statuscode,
                               std::string endpoint) {
     status(statuscode);
     header("Location", endpoint);
-    sendBuffer();
     close(client);
 }
 
 void HttpConnection::redirect(int statuscode, std::string endpoint) {
     status(static_cast<int>(statuscode));
     header("Location", endpoint);
-    sendBuffer();
     close(client);
 }
 

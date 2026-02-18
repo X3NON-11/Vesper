@@ -2,11 +2,16 @@
 
 #include <algorithm>        // std::remove_if
 #include <netinet/tcp.h>    // Set timeout
+#include <coroutine>
 
 #include "../utils/logging.h"        // My own logging library/header
 #include "../http/radixTree.h"      // Used for the tries that saves all the endpoints and middlewares
 #include "../utils/urlEncoding.h"    // Used to decode/encode url in HttpConnection
 #include "../tcp/TcpServer.h"
+#include "../async/awaiters.h"
+#include "../async/eventLoop.h"
+#include "../async/task.h"
+#include "../async/eventLoop_fwd.h"
 
 namespace vesper {
     class Router;
@@ -115,16 +120,16 @@ namespace vesper {
                 std::string body;
                 std::string postData;
                 std::string endpointStr;
+                
+                std::string error = "";
             };
             // Overrides the onClient() from TcpServer
             // Decides on what endpoint & when to run what handler/middleware
-            void onClient(int client) override;
-            bool receiveClientRequest(int client, Context &ctx);
-            bool parseRequestLine(Context &ctx);
-            bool shouldCloseConnection(Context &ctx);
+            async::Task onClient(int client) override;
+            void parseRequestLine(Context &ctx);
+            void shouldCloseConnection(Context &ctx);
             void getContentLength(Context &ctx);
             void parseHeadersAndBody(Context &ctx);
-            bool fetchPostData(int client, Context &ctx);
             void populateConnection(HttpConnection &connection, Context &ctx);
             void getQuery(Context &ctx, HttpConnection &connection);
             void parseUrlParameters(Context &ctx, HttpConnection &connection);
