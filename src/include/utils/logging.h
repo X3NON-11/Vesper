@@ -25,7 +25,7 @@ inline const char* BLUE   = "\033[34m";
 inline const char* GREEN  = "\033[32m";
 
 inline void setupLogger() {
-    file.open("logs.txt", std::ios::app);
+    file.open("logs.txt");
     if (!file.is_open()) {
         std::cerr << RED << "Error: Could not open log file." << RESET << std::endl;
     }

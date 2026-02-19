@@ -58,18 +58,17 @@ async::Task HttpServer::onClient(int client) {
         }
     }
 
-    // Parse http data
-    parseRequestLine(ctx);
-    if (!ctx.error.empty()) {
-        log(LogType::Warn, ctx.error);
+    // Parse http header
+    // https://cplusplus.com/reference/cstdio/sscanf/
+    if (sscanf(ctx.request.data(), "%s %s %s", ctx.method, ctx.clientEndpoint,
+               ctx.version) != 3) {
+        log(LogType::Warn, "Failed to parse http header");
         close(client);
         co_return;
     }
 
     // Skip Website Logo if client connected with a browser
-    shouldCloseConnection(ctx);
-    if (!ctx.error.empty()) {
-        // No logs because would be annoying to log this
+    if (strcmp(ctx.clientEndpoint, "/favicon.ico") == 0) {
         close(client);
         co_return;
     }
@@ -79,9 +78,18 @@ async::Task HttpServer::onClient(int client) {
         parseHeaders(ctx.request.data(), ctx.request.size());
 
     // Get the content length
-    getContentLength(ctx);
+    ctx.contentLength = 0;
+    char *cl = strstr(ctx.request.data(), "Content-Length:");
+    if (cl)
+        sscanf(cl, "Content-Length: %d", &ctx.contentLength);
+
     // Find end of headers
-    parseHeadersAndBody(ctx);
+    ctx.headerEnd = ctx.request.find("\r\n\r\n");
+    if (ctx.headerEnd != std::string::npos &&
+        ctx.headerEnd + 4 < ctx.request.size()) {
+        ctx.body = ctx.request.substr(ctx.headerEnd + 4);
+    }
+
     // Save the body to postData
     ctx.postData = ctx.body;
     auto start = std::chrono::steady_clock::now();
@@ -109,62 +117,13 @@ async::Task HttpServer::onClient(int client) {
     }
 
     // Saves all the variables to connection
-    populateConnection(connection, ctx);
-    // Adjust clientEndpoint given to the handlers so querys are
-    // disregarded
-    getQuery(ctx, connection);
-    // MiddleWare / All Handlers
-    parseUrlParameters(ctx, connection);
-    // Run Middlewares and handler
-    handleRequest(connection, ctx);
-    // Close connection and logs
-    std::string http = connection.response.toHttpString();
-    send(client, http.c_str(), http.size(), 0);
-    close(client);
-    logConnection(static_cast<int>(connection.response.status),
-                  connection.response.method, connection.request.path);
-    co_return;
-}
-
-// https://cplusplus.com/reference/cstdio/sscanf/
-void HttpServer::parseRequestLine(Context &ctx) {
-    if (sscanf(ctx.request.data(), "%s %s %s", ctx.method, ctx.clientEndpoint,
-               ctx.version) != 3)
-        ctx.error = "Failed to parse http request";
-}
-
-// Skip Website Logo if client connected with a browser
-void HttpServer::shouldCloseConnection(Context &ctx) {
-    if (strcmp(ctx.clientEndpoint, "/favicon.ico") == 0)
-        ctx.error = "Skipped favicon.ico";
-}
-
-void HttpServer::getContentLength(Context &ctx) {
-    ctx.contentLength = 0;
-    char *cl = strstr(ctx.request.data(), "Content-Length:");
-    if (cl)
-        sscanf(cl, "Content-Length: %d", &ctx.contentLength);
-}
-
-// Find end of headers
-void HttpServer::parseHeadersAndBody(Context &ctx) {
-    ctx.headerEnd = ctx.request.find("\r\n\r\n");
-    if (ctx.headerEnd != std::string::npos &&
-        ctx.headerEnd + 4 < ctx.request.size()) {
-        ctx.body = ctx.request.substr(ctx.headerEnd + 4);
-    }
-}
-
-void HttpServer::populateConnection(HttpConnection &connection, Context &ctx) {
     connection.setClientBuffer(ctx.postData);
     connection.request.method = std::string(ctx.method);
     connection.request.path = ctx.clientEndpoint;
     connection.request.httpVersion = ctx.version;
-}
 
-// Adjust clientEndpoint given to the handlers so querys are
-// disregarded
-void HttpServer::getQuery(Context &ctx, HttpConnection &connection) {
+    // Adjust clientEndpoint given to the handlers so querys are
+    // disregarded
     ctx.endpointStr = std::string(ctx.clientEndpoint);
     auto pos = ctx.endpointStr.find('?');
     if (pos != std::string::npos) {
@@ -176,18 +135,27 @@ void HttpServer::getQuery(Context &ctx, HttpConnection &connection) {
         ctx.endpointStr = path;
         connection.request.rawQuery = decodeURL(query);
     }
-}
 
-void HttpServer::parseUrlParameters(Context &ctx, HttpConnection &connection) {
+    // MiddleWare / All Handlers
     std::unordered_map<std::string, std::string> parameterMap =
         endpointsTree.getUrlParams(ctx.endpointStr, std::string(ctx.method));
     for (auto &pair : parameterMap) {
         pair.second = decodeURL(pair.second);
     }
     connection.request.params = parameterMap;
+
+    // Run Middlewares and handler
+    // Runs mutable so when the function ends the thread can still execute
+    // everything, because it is copied
+    threads.newTask([this, client, connection, ctx]() mutable {
+        handleRequest(client, connection, ctx);
+    });
+
+    co_return;
 }
 
-void HttpServer::handleRequest(HttpConnection &connection, Context &ctx) {
+void HttpServer::handleRequest(int client, HttpConnection &connection,
+                               Context &ctx) {
 
     std::vector<std::function<void(HttpConnection &)>> middlewares;
     middlewareTree.collectPrefixHandlers(ctx.endpointStr, ctx.method,
@@ -199,7 +167,7 @@ void HttpServer::handleRequest(HttpConnection &connection, Context &ctx) {
         if (endpointsTree.matchURL(ctx.endpointStr, ctx.method)) {
             auto h = endpointsTree.getNodeHandler(ctx.endpointStr, ctx.method);
             if (h) {
-                threads.newTask([h, &connection]() { h(connection); });
+                h(connection);
                 handled = true;
             }
         }
@@ -207,6 +175,13 @@ void HttpServer::handleRequest(HttpConnection &connection, Context &ctx) {
 
     if (!handled)
         connection.string(404, "");
+
+    // Close connection and logs
+    std::string http = connection.response.toHttpString();
+    send(client, http.c_str(), http.size(), 0);
+    close(client);
+    logConnection(static_cast<int>(connection.response.status),
+                  connection.response.method, connection.request.path);
 }
 
 // =============
@@ -241,6 +216,7 @@ void HttpServer::runMiddlewareChain(
     HttpConnection &c, std::vector<std::function<void(HttpConnection &)>> &mws,
     size_t index, std::function<void()> finalHandler) {
     if (index >= mws.size()) {
+        // threads.newTask([finalHandler]() { finalHandler(); });
         finalHandler();
         return;
     }

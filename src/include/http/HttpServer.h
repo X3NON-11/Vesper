@@ -120,21 +120,11 @@ namespace vesper {
                 std::string body;
                 std::string postData;
                 std::string endpointStr;
-                
-                std::string error = "";
             };
             // Overrides the onClient() from TcpServer
             // Decides on what endpoint & when to run what handler/middleware
             async::Task onClient(int client) override;
-            void parseRequestLine(Context &ctx);
-            void shouldCloseConnection(Context &ctx);
-            void getContentLength(Context &ctx);
-            void parseHeadersAndBody(Context &ctx);
-            void populateConnection(HttpConnection &connection, Context &ctx);
-            void getQuery(Context &ctx, HttpConnection &connection);
-            void parseUrlParameters(Context &ctx, HttpConnection &connection);
-            void handleRequest(HttpConnection &connection, Context &ctx);
-            void finalizeRequest(HttpConnection &connection, int client);
+            void handleRequest(int client, HttpConnection &connection, Context &ctx);
             
             // Used to create endpoints by functions like GET()
             void createEndpoint(std::string method, std::string endpoint, std::function<void(HttpConnection&)> h);

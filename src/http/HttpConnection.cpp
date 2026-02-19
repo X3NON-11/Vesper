@@ -87,9 +87,9 @@ void HttpResponse::setHeader(const std::string &name,
 
 void HttpResponse::removeHeader(std::string &name) { headers.erase(name); }
 
-// =============================================================================
-// HTTP-CONNECTION responsible for translating abstractions to tcp usable format
-// =============================================================================
+// ===============
+// HTTP-CONNECTION
+// ===============
 
 HttpConnection::HttpConnection(int client, vesper::HttpServer *server)
     : client(client), server(server) {}
