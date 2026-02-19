@@ -37,7 +37,7 @@ How to use
 ==========
 .. code-block:: cpp
 
-    #include <vesper.h>
+    #include <vesper/vesper.h>
     
     // ====================
     // All functions

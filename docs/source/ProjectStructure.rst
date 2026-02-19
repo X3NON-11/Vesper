@@ -10,7 +10,7 @@ After including the header:
 
 .. code-block:: cpp
 
-    #include <vesper.h>
+    #include <vesper/vesper.h>
 
 you can create an HTTP server using the `vesper::HttpServer` class, which is a subclass of `TcpServer`.
 

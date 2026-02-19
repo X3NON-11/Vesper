@@ -20,7 +20,7 @@
 
 # How to use
 ```c++
-#include <vesper.h>
+#include <vesper/vesper.h>
 
 // ====================
 // All functions
