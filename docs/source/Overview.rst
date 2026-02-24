@@ -28,7 +28,7 @@ Installation
     
     FetchContent_Declare(
       vesper
-      GIT_REPOSITORY https://github.com/DieOlive/Vesper
+      GIT_REPOSITORY https://github.com/X3NON-11/Vesper
       GIT_TAG prerelease_0.95
     )
     
@@ -49,6 +49,6 @@ Installation
     target_link_libraries(example1 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/vesper/libvesper.a)
     
 | **For Development**
-| 1. Download the library (git clone git@github.com:DieOlive/Vesper.git)
+| 1. Download the library (git clone git@github.com:X3NON-11/Vesper.git)
 | 2. Go into the folder and then you are already done
 | => Recommended: The CMakeLists is set up so you build a library and executable (for testing), so for ease of testing you can use the main.cpp under Vesper/examples

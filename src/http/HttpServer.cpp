@@ -274,7 +274,7 @@ void HttpServer::staticFile(std::string endpoint, std::string file) {
                         std::istreambuf_iterator<char>());
 
     staticFileInfo sf;
-    sf.content = content;
+    sf.content = zlibCompress(content);
     sf.contentType = getMimeType(file);
     staticFilesMap[endpoint] = sf;
 
@@ -283,6 +283,7 @@ void HttpServer::staticFile(std::string endpoint, std::string file) {
             c.header("X-Content-Type-Options", "nosniff");
             c.header("Content-Security-Policy", "default-src 'self';");
             c.header("X-Frame-Options", "DENY");
+            c.header("Content-Encoding", "deflate");
             staticFileInfo file = staticFilesMap[c.request.path];
             c.data(file.contentType, file.content);
         } else {
@@ -349,6 +350,21 @@ std::string HttpServer::getMimeType(std::string file) {
 
     // Safe fallback
     return "application/octet-stream";
+}
+
+std::string HttpServer::zlibCompress(std::string &input) {
+    uLong sourceLen = input.size();
+    uLong destLen = compressBound(sourceLen);
+    std::vector<unsigned char> buffer(destLen);
+
+    int res = compress2(buffer.data(), &destLen,
+                        reinterpret_cast<const Bytef *>(input.data()),
+                        sourceLen, Z_BEST_COMPRESSION);
+
+    if (res != Z_OK)
+        return {};
+
+    return std::string(reinterpret_cast<char *>(buffer.data()), destLen);
 }
 
 // Endpoint

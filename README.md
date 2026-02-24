@@ -72,7 +72,7 @@ include(FetchContent)
 
 FetchContent_Declare(
   vesper
-  GIT_REPOSITORY https://github.com/DieOlive/Vesper
+  GIT_REPOSITORY https://github.com/X3NON-11/Vesper
   GIT_TAG prerelease_0.95
 )
 

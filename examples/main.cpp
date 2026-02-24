@@ -25,7 +25,7 @@ int main() {
     server.POST("/post", postEndpoint);
     server.GET("/query", queryHandler);
     server.GET("/header", headerHandler);
-    // server.staticFile("/asset", "PicturePath");
+    // server.staticFile("/asset", "/home/xenon/Bilder/ProfilePicture.png");
     // server.staticDir("/asset", "PicturesPath");
 
     vesper::Router group = server.group("/user");

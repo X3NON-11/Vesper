@@ -16,6 +16,8 @@
 #include "../async/task.h"
 #include "../async/eventLoop_fwd.h"
 
+#include <zlib.h>           // Compress static files
+
 namespace vesper {
     class Router;
 }
@@ -144,6 +146,7 @@ namespace vesper {
             
             // Used when serving static files
             std::string getMimeType(std::string file);
+            std::string zlibCompress(std::string& input);
     };
 }
 
