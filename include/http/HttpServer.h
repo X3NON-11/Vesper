@@ -28,6 +28,7 @@ namespace vesper {
         public:
             HttpServer();
             ~HttpServer();
+            std::string domain = "";
             void run(std::string ipAddress, int port); // Runs startServer & runServer on a different thread
             int timeout = 2;
             // Groups together endpoints/middleware

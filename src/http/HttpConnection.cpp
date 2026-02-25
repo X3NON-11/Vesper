@@ -304,6 +304,53 @@ void HttpConnection::redirect(int statuscode, std::string endpoint) {
     close(client);
 }
 
+void HttpConnection::setCookie(std::string name, std::string value, int maxAge,
+                               std::string path, std::string domain,
+                               bool secure, bool httpOnly) {
+    std::ostringstream cookie;
+    cookie << name << "=" << value;
+    if (maxAge >= 0)
+        cookie << "; Max-Age=" << maxAge;
+    if (!path.empty())
+        cookie << "; Path=" << path;
+    if (!domain.empty())
+        cookie << "; Domain=" << domain;
+    if (secure)
+        cookie << "; Secure";
+    if (httpOnly)
+        cookie << "; HttpOnly";
+
+    header("Set-Cookie", cookie.str());
+}
+
+void HttpConnection::setCookie(std::string name, std::string value, int maxAge,
+                               bool secure, bool httpOnly) {
+    setCookie(name, value, maxAge, request.path, domain, secure, httpOnly);
+}
+void HttpConnection::setCookie(std::string name, std::string value, bool secure,
+                               bool httpOnly) {
+    setCookie(name, value, -1, request.path, domain, secure, httpOnly);
+}
+void HttpConnection::setCookie(std::string name, std::string value) {
+    setCookie(name, value, -1, request.path, domain, false, false);
+}
+std::string HttpConnection::cookies(std::string name) {
+    std::string rawHeader = getHeader("Cookie");
+    if (rawHeader.empty())
+        return "";
+
+    std::stringstream h(rawHeader);
+    std::string item;
+
+    while (std::getline(h, item, ';')) {
+        item.erase(0, item.find_first_not_of(" ")); // trim spaces
+        if (item.find(name + "=") == 0) {
+            return item.substr(name.length() + 1);
+        }
+    }
+    return "";
+}
+
 void HttpConnection::setMethod(std::string method) { response.method = method; }
 
 void HttpConnection::setClientBuffer(std::string clientBuffer) {

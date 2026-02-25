@@ -148,6 +148,7 @@ namespace vesper {
             std::function<void()> nextFn;
 
         public:
+            std::string domain = "";
             // Stores all information about the request (from the client)
             HttpRequest request;
             // How the user can access all response internal variables/functions
@@ -189,5 +190,10 @@ namespace vesper {
             std::string query(std::string clientString);
             std::string param(std::string clientParam);
             std::string getHeader(std::string clientHeader);
+            void setCookie(std::string name, std::string value, int maxAge, std::string path, std::string domain, bool secure, bool httpOnly);
+            void setCookie(std::string name, std::string value, int maxAge, bool secure, bool httpOnly);
+            void setCookie(std::string name, std::string value, bool secure, bool httpOnly);
+            void setCookie(std::string name, std::string value);
+            std::string cookies(std::string clientString);
     };
 }

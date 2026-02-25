@@ -10,6 +10,7 @@ void postEndpoint(vesper::HttpConnection &c);
 void queryHandler(vesper::HttpConnection &c);
 void userIdHandler(vesper::HttpConnection &c);
 void headerHandler(vesper::HttpConnection &c);
+void cookies(vesper::HttpConnection &c);
 
 int main() {
     debugging = true;      // Default on
@@ -25,6 +26,7 @@ int main() {
     server.POST("/post", postEndpoint);
     server.GET("/query", queryHandler);
     server.GET("/header", headerHandler);
+    server.GET("/cookies", cookies);
     // server.staticFile("/asset", "/home/xenon/Bilder/ProfilePicture.png");
     // server.staticDir("/asset", "PicturesPath");
 
@@ -98,4 +100,10 @@ void userIdHandler(vesper::HttpConnection &c) {
 void headerHandler(vesper::HttpConnection &c) {
     std::string message = c.getHeader("test");
     c.string(message);
+}
+
+void cookies(vesper::HttpConnection &c) {
+    c.setCookie("test", "1234");
+    std::string cookie = c.cookies("test");
+    c.string(cookie);
 }

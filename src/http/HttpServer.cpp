@@ -19,6 +19,7 @@ HttpServer::~HttpServer() {
 // Sets up & runs the server using the previously created objects
 void HttpServer::run(std::string ipAddress, int port) {
     setupLogger();
+    domain = ipAddress;
     if (ipAddress == "localhost")
         ipAddress = "127.0.0.1";
     startServer(ipAddress, port);
@@ -121,6 +122,7 @@ async::Task HttpServer::onClient(int client) {
     connection.request.method = std::string(ctx.method);
     connection.request.path = ctx.clientEndpoint;
     connection.request.httpVersion = ctx.version;
+    connection.domain = domain;
 
     // Adjust clientEndpoint given to the handlers so querys are
     // disregarded
