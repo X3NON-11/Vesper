@@ -28,7 +28,7 @@ void HttpServer::run(std::string ipAddress, int port) {
 }
 
 // Decides when & at what endpoint to run the handlers
-async::Task HttpServer::onClient(int client) {
+async::Task HttpServer::onClient(socketT client) {
     // Create the object that gets access by the library user
     HttpConnection connection(client, this);
     Context ctx{};
@@ -44,7 +44,7 @@ async::Task HttpServer::onClient(int client) {
             ctx.request.append(ctx.buffer.data(), r);
         } else if (r == 0) {
             log(LogType::Warn, "Client closed connection");
-            close(client);
+            closeSocket(client);
             co_return;
         } else { // r < 0
             log(LogType::Warn, "recv error");
@@ -54,7 +54,7 @@ async::Task HttpServer::onClient(int client) {
         // Prevent header abuse
         if (ctx.request.size() > 16 * 1024) {
             log(LogType::Warn, "HTTP headers too large");
-            close(client);
+            closeSocket(client);
             co_return;
         }
     }
@@ -64,13 +64,13 @@ async::Task HttpServer::onClient(int client) {
     if (sscanf(ctx.request.data(), "%s %s %s", ctx.method, ctx.clientEndpoint,
                ctx.version) != 3) {
         log(LogType::Warn, "Failed to parse http header");
-        close(client);
+        closeSocket(client);
         co_return;
     }
 
     // Skip Website Logo if client connected with a browser
     if (strcmp(ctx.clientEndpoint, "/favicon.ico") == 0) {
-        close(client);
+        closeSocket(client);
         co_return;
     }
 
@@ -101,7 +101,7 @@ async::Task HttpServer::onClient(int client) {
             ctx.postData.append(ctx.buffer.data(), r);
         } else if (r == 0) {
             log(LogType::Warn, "Client closed during body");
-            close(client);
+            closeSocket(client);
             co_return;
         } else {
             log(LogType::Warn, "recv error");
@@ -112,7 +112,7 @@ async::Task HttpServer::onClient(int client) {
         if (std::chrono::duration_cast<std::chrono::seconds>(now - start)
                 .count() > timeout) {
             log(LogType::Warn, "Client took too long to send body");
-            close(client);
+            closeSocket(client);
             co_return;
         }
     }
@@ -156,7 +156,7 @@ async::Task HttpServer::onClient(int client) {
     co_return;
 }
 
-void HttpServer::handleRequest(int client, HttpConnection &connection,
+void HttpServer::handleRequest(socketT client, HttpConnection &connection,
                                Context &ctx) {
 
     std::vector<std::function<void(HttpConnection &)>> middlewares;
@@ -181,7 +181,7 @@ void HttpServer::handleRequest(int client, HttpConnection &connection,
     // Close connection and logs
     std::string http = connection.response.toHttpString();
     send(client, http.c_str(), http.size(), 0);
-    close(client);
+    closeSocket(client);
     logConnection(static_cast<int>(connection.response.status),
                   connection.response.method, connection.request.path);
 }

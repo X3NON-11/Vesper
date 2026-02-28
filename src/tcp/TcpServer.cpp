@@ -14,12 +14,51 @@ TcpServer::~TcpServer() {
 // Close Tcp Socket
 void TcpServer::closeServer() {
     if (listenSocket >= 0) {
-        close(listenSocket);
+        closeSocket(listenSocket);
     }
 }
 
 // Sets up a basic Tcp Socket
-int TcpServer::startServer(std::string ipAddress, int port) {
+socketT TcpServer::startServer(std::string ipAddress, int port) {
+#ifdef _WIN32
+    // https://stackoverflow.com/questions/37266805/tcpclient-class-in-c-microsoft-visual-studio-example
+    // Initialize Winsock
+    WSADATA wsaData;
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+        log(LogType::Error, "WSAStartup failed");
+        return 1;
+    }
+
+    // Create a socket
+    SOCKET serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (serverSocket == INVALID_SOCKET) {
+        log(LogType::Error, "Socket creation failed: " + WSAGetLastError());
+        WSACleanup();
+        return 1;
+    }
+
+    // Bind the socket to an IP address and port
+    sockaddr_in service;
+    service.sin_family = AF_INET;
+    service.sin_addr.s_addr = inet_addr("127.0.0.1"); // Replace with desired IP
+    service.sin_port = htons(55555);                  // Port number
+
+    if (bind(serverSocket, (sockaddr *)&service, sizeof(service)) ==
+        SOCKET_ERROR) {
+        log(LogType::Error, "Bind failed " + WSAGetLastError());
+        closesocket(serverSocket);
+        WSACleanup();
+        return 1;
+    }
+
+    // Listen for incoming connections
+    if (listen(serverSocket, 1) == SOCKET_ERROR) {
+        log(LogType::Error, "Listen failed: " + WSAGetLastError());
+        closesocket(serverSocket);
+        WSACleanup();
+        return 1;
+    }
+#else
     /*  ##### Inspiration #####
 
         https://github.com/bozkurthan/Simple-TCP-Server-Client-CPP-Example/blob/master/tcp-Server.cpp
@@ -58,13 +97,14 @@ int TcpServer::startServer(std::string ipAddress, int port) {
     if (listen(listenSocket, 5) != 0) {
         log(LogType::Error, "Couldn't listen on socket");
     }
+#endif
 
     return 0;
 }
 
 async::Task TcpServer::runServer() {
     while (true) {
-        int client = co_await async::AcceptAwaiter{listenSocket};
+        socketT client = co_await async::AcceptAwaiter{listenSocket};
 
         if (client < 0)
             continue;
@@ -77,16 +117,22 @@ async::Task TcpServer::runServer() {
 
 // Just a basic placeholder
 // Is overwritten in HttpServer
-async::Task TcpServer::onClient(int client) {
+async::Task TcpServer::onClient(socketT client) {
     log(LogType::Info, "Client accepted");
     const char *message = "No Handler parsed\n";
     send(client, message, strlen(message), 0);
-    close(client);
+    closeSocket(client);
     co_return;
 }
 
 // Functions that use Linux only functions
-bool TcpServer::setSocketNonBlocking(int client) {
+bool TcpServer::setSocketNonBlocking(socketT client) {
+#ifdef _WIN32
+    u_long iMode = 1;
+    if (ioctlsocket(client, FIONBIO, &iMode) != NO_ERROR) {
+        log(LogType::Warn, "Failed to set socket to non blocking");
+    }
+#else
     int flags = fcntl(client, F_GETFL, 0);
     if (flags == -1) {
         log(LogType::Warn, "fcntl F_GETFL");
@@ -97,6 +143,7 @@ bool TcpServer::setSocketNonBlocking(int client) {
         log(LogType::Warn, "fcntl F_SETFL");
         return false;
     }
+#endif
 
     return true;
 }

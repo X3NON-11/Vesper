@@ -39,8 +39,10 @@ target_link_libraries(vesper PRIVATE zlib)
 FetchContent_Declare(
   glaze
   GIT_REPOSITORY https://github.com/stephenberry/glaze.git
-  GIT_TAG main
-  GIT_SHALLOW TRUE
+  GIT_TAG v7.0.2
 )
+set(GLAZE_ENABLE_TESTS OFF CACHE BOOL "" FORCE)
+set(GLAZE_ENABLE_BENCHMARKS OFF CACHE BOOL "" FORCE)
+set(GLAZE_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(glaze)
 target_link_libraries(vesper PUBLIC glaze::glaze)

@@ -91,7 +91,7 @@ void HttpResponse::removeHeader(std::string &name) { headers.erase(name); }
 // HTTP-CONNECTION
 // ===============
 
-HttpConnection::HttpConnection(int client, vesper::HttpServer *server)
+HttpConnection::HttpConnection(socketT client, vesper::HttpServer *server)
     : client(client), server(server) {}
 
 // All abstractions like c.string to send plain text
@@ -288,20 +288,20 @@ std::string HttpConnection::getHeader(std::string clientHeader) {
 void HttpConnection::redirect(std::string endpoint) {
     status(302); // Not found
     header("Location", endpoint);
-    close(client);
+    closeSocket(client);
 }
 
 void HttpConnection::redirect(vesper::HttpResponse::StatusCodes statuscode,
                               std::string endpoint) {
     status(statuscode);
     header("Location", endpoint);
-    close(client);
+    closeSocket(client);
 }
 
 void HttpConnection::redirect(int statuscode, std::string endpoint) {
     status(static_cast<int>(statuscode));
     header("Location", endpoint);
-    close(client);
+    closeSocket(client);
 }
 
 void HttpConnection::setCookie(std::string name, std::string value, int maxAge,
