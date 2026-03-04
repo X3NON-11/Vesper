@@ -34,11 +34,15 @@ public:
             log(LogType::Warn, "epoll_ctl watchWrite");
         }
     }
+
+    void unwatch(int fd) {
+        epoll_ctl(epfd, EPOLL_CTL_DEL, fd, nullptr);
+    }
     
     void loop() {
         while (true) {
             int n = epoll_wait(epfd, events, MAX_EVENTS, -1);
-            for (int i = 0; i < n; ++i) {
+            for (int i = 0; i < n; i++) {
                 auto h = std::coroutine_handle<>::from_address(events[i].data.ptr);
                 h.resume();
             }

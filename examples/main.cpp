@@ -1,9 +1,10 @@
-#include <vesper.h>
+#include <../include/vesper/vesper.h>
 
 // ==============================
 //         All functions
 // ==============================
 void myHandler(vesper::HttpConnection &c);
+void hello(vesper::HttpConnection &c);
 void testEndpoint(vesper::HttpConnection &c);
 void testMiddleware(vesper::HttpConnection &c);
 void postEndpoint(vesper::HttpConnection &c);
@@ -23,6 +24,7 @@ int main() {
     // server.setMiddleware("/test", "ALL", testMiddleware);
     server.GET("/", myHandler);                        // Website endpoint
     server.GET("/test", testMiddleware, testEndpoint); // JSON endpoint
+    server.GET("/hello", hello);
     server.POST("/post", postEndpoint);
     server.GET("/query", queryHandler);
     server.GET("/header", headerHandler);
@@ -107,3 +109,5 @@ void cookies(vesper::HttpConnection &c) {
     std::string cookie = c.cookies("test");
     c.string(cookie);
 }
+
+void hello(vesper::HttpConnection &c) { c.string("Hello World"); }

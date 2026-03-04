@@ -1,14 +1,12 @@
 #pragma once
 
 #include <cstring>          // memset
-#include <netinet/in.h>     // sockaddr_in
 #include <functional>       // std::function
 #include <string>           // std::string::npos
 #include <thread>           // multithreading for different clients
 #include <fcntl.h>          // fcntl make recv non blocking
 #include <vector>           // Used for storing the client buffer
 #include <coroutine>        // Used for the async io
-#include <sys/epoll.h>
 
 #include "../utils/logging.h"        // My own logging library/header
 #include "../http/HttpConnection.h"

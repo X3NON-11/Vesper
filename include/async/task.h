@@ -3,7 +3,7 @@
 #include <exception>
 
 namespace vesper::async {
-
+    
 struct Task {
     struct promise_type {
         Task get_return_object() noexcept {
@@ -25,5 +25,4 @@ struct Task {
         }
     };
 };
-
 } // namespace vesper::async

@@ -1,0 +1,25 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(ZLIB)
+find_dependency(glaze)
+
+include(CMakeFindDependencyMacro)
+
+configure_package_config_file(
+    cmake/vesperConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/vesperConfig.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/vesper
+)
+
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/vesperConfigVersion.cmake
+    VERSION 1.0.0
+    COMPATIBILITY SameMajorVersion
+)
+
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/vesperConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/vesperConfigVersion.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/vesper
+)

@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <iomanip>
+#include <sstream>
 
 inline bool debugging = true;
 inline bool ignoreWarnings = true;

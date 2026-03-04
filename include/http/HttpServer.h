@@ -1,7 +1,6 @@
 #pragma once
 
 #include <algorithm>        // std::remove_if
-#include <netinet/tcp.h>    // Set timeout
 #include <coroutine>
 #include <fstream>          // Open the files for static files
 #include <unordered_map>    // Used for storing mime types in getMimeType

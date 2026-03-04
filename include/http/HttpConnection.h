@@ -2,7 +2,6 @@
 
 #include <string>           // std::string::npos
 #include <functional>       // std::function
-#include <sys/socket.h>     // socket, bind, listen
 #include <coroutine>
 
 #include "../utils/logging.h"

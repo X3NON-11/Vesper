@@ -1,8 +1,41 @@
-cmake_minimum_required(VERSION 4.0)
-project(vesper)
-include(FetchContent)
+cmake_minimum_required(VERSION 3.21)
+project(vesper LANGUAGES CXX)
 
-# Create a library from your source files
+include(FetchContent)
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+# =========================
+# Dependencies
+# =========================
+
+option(VESPER_FETCH_DEPS "Fetch dependencies locally" ON)
+
+if(VESPER_FETCH_DEPS)
+    include(FetchContent)
+
+    FetchContent_Declare(
+        glaze
+        GIT_REPOSITORY https://github.com/stephenberry/glaze.git
+        GIT_TAG v7.0.2
+    )
+
+    FetchContent_MakeAvailable(glaze)
+
+    find_package(ZLIB REQUIRED)
+else()
+    find_package(ZLIB REQUIRED)
+    find_package(glaze CONFIG REQUIRED)
+endif()
+
+set(GLAZE_ENABLE_TESTS OFF CACHE BOOL "" FORCE)
+set(GLAZE_ENABLE_BENCHMARKS OFF CACHE BOOL "" FORCE)
+set(GLAZE_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+
+# =========================
+# Library
+# =========================
+
 add_library(vesper
     src/http/HttpServer.cpp
     src/http/HttpConnection.cpp
@@ -12,37 +45,45 @@ add_library(vesper
     src/utils/threadPool.cpp
 )
 
-# Specify include directories for the library
-target_include_directories(vesper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+add_library(vesper::vesper ALIAS vesper)
 
-# Add Flag like this because it else conflicts with zlib
-target_compile_options(vesper PRIVATE -fcoroutines)
+target_include_directories(vesper
+    PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
 
-# ONLY FOR TESTING PURPOSES
+install(DIRECTORY include/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+target_compile_features(vesper PUBLIC cxx_std_20)
+
+target_link_libraries(vesper
+    PUBLIC glaze::glaze
+    PUBLIC ZLIB::ZLIB
+)
+
+install(TARGETS vesper
+    EXPORT vesperTargets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(EXPORT vesperTargets
+    FILE vesperTargets.cmake
+    NAMESPACE vesper::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/vesper
+)
+
+# =========================
+# Example Binary (for testing)
+# =========================
+
 add_executable(vesper-app examples/main.cpp)
-# Add Flag like this because it else conflicts with zlib
-target_compile_options(vesper-app PRIVATE -fcoroutines)
-target_link_libraries(vesper-app vesper)
 
-# ==================
-# External Libraries
-# ==================
-
-FetchContent_Declare(
-  zlib
-  GIT_REPOSITORY https://github.com/madler/zlib.git
-  GIT_TAG v1.3.1
+target_link_libraries(vesper-app
+    PRIVATE vesper::vesper
 )
-FetchContent_MakeAvailable(zlib)
-target_link_libraries(vesper PRIVATE zlib)
-
-FetchContent_Declare(
-  glaze
-  GIT_REPOSITORY https://github.com/stephenberry/glaze.git
-  GIT_TAG v7.0.2
-)
-set(GLAZE_ENABLE_TESTS OFF CACHE BOOL "" FORCE)
-set(GLAZE_ENABLE_BENCHMARKS OFF CACHE BOOL "" FORCE)
-set(GLAZE_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(glaze)
-target_link_libraries(vesper PUBLIC glaze::glaze)
