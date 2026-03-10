@@ -29,7 +29,7 @@ namespace vesper {
             threadPool threads;
 
         public:
-            TcpServer() = default; // Only creates a object
+            TcpServer(); // Only creates a object
             virtual ~TcpServer(); // Allows overide for subclasses (HttpServer)
 
             // Listens for new connections (clients)

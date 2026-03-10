@@ -18,7 +18,6 @@ HttpServer::~HttpServer() {
 
 // Sets up & runs the server using the previously created objects
 void HttpServer::run(std::string ipAddress, int port) {
-    setupLogger();
     if (ipAddress == "localhost")
         ipAddress = "127.0.0.1";
     domain = ipAddress;

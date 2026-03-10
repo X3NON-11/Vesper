@@ -5,6 +5,8 @@ namespace vesper {
 // TCP-SERVER
 // ==========
 
+TcpServer::TcpServer() { setupLogger(); }
+
 // Automatically clean up when closing
 TcpServer::~TcpServer() {
     closeServer();

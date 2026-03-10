@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <sstream>
 #include <functional>
+#include <filesystem>
 
 inline bool debugging = true;
 inline bool ignoreWarnings = true;
@@ -29,9 +30,9 @@ inline const char* GREEN  = "\033[32m";
 inline std::function<void()> errorHandler;
 
 inline void setupLogger() {
-    file.open("logs.txt");
+    file.open("logs.txt", std::ios::trunc);
     if (!file.is_open()) {
-        std::cerr << RED << "Error: Could not open log file." << RESET << std::endl;
+        std::cerr << RED << "[Error] Could not open or create log file" << RESET << std::endl;
     }
 }
 
@@ -43,12 +44,8 @@ inline void closeLogger() {
 inline std::string currentTime() {
     std::time_t now = std::time(nullptr);
     std::tm tm_info;
-
-#if defined(_WIN32) || defined(_WIN64)
-    localtime_s(&tm_info, &now); // Windows safe
-#else
+    
     localtime_r(&now, &tm_info); // Linux/Unix safe
-#endif
 
     char buffer[32]; // larger buffer
     std::strftime(buffer, sizeof(buffer), "%Y/%m/%d - %H:%M:%S", &tm_info);
@@ -67,7 +64,10 @@ inline void log(LogType type, const std::string& message) {
             color = RED;
             output = "[ERROR] " + dt + " | " +  message;
             std::cerr << color << output << RESET << std::endl;
-            if (file.is_open()) file << output << '\n';
+            if (file.is_open()) {
+                file.flush();
+                file << output << '\n';
+            }
             if (errorHandler)
                 errorHandler();
             break;
@@ -76,22 +76,29 @@ inline void log(LogType type, const std::string& message) {
             color = YELLOW;
             output = "[WARN] " + dt + " | " +  message;
             std::cout << color << output << RESET << std::endl;
-            if (file.is_open()) file << output << '\n';
+            if (file.is_open()) {
+                file.flush();
+                file << output << '\n';
+            }
             break;
         case LogType::Info:
             output = "[INFO] " + dt + " | " +  message;
             std::cout << output <<  std::endl;
-            if (file.is_open()) file << output << '\n';
+            if (file.is_open()) {
+                file.flush();
+                file << output << '\n';
+            }
             break;
         case LogType::Debug:
             color = BLUE;
             output = "[DEBUG] " + dt + " | " +  message;
             std::cout << color << output << RESET << std::endl;
-            if (file.is_open()) file << output << '\n';
+            if (file.is_open()) {
+                file.flush();
+                file << output << '\n';
+            }
             break;
     }
-
-    if (file.is_open()) file.flush();
 }
 
 // Optional shorthand for simple logging like Gin
