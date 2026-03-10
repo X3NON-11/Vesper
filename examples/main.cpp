@@ -39,7 +39,7 @@ int main() {
 
     // server.onError([]() { exit(0); });
 
-    server.run("localhost", 8080);
+    server.run("0.0.0.0", 8080);
 }
 
 // Default handler: serve a small HTML page
