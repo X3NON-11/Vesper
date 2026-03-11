@@ -1,0 +1,12 @@
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      additional_contexts:
+        parent: ../
+    volumes:
+      - ./data:/app
+    ports:
+      - 8080:8080
+    restart: on-failure
