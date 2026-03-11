@@ -1,6 +1,6 @@
 <div align="center">
-
-<img width="400" height="163" alt="VesperLogo" src="https://github.com/user-attachments/assets/00b16129-9948-4709-bffe-a2bd678601f0" />
+  
+  <img width="398" height="153" alt="VesperLogo" src="https://github.com/user-attachments/assets/4c61c113-be77-4a67-90a1-b829be1ecc0e" />
 
  *A Gin inspired http server library for C++*
 </div>
