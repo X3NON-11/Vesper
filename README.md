@@ -56,7 +56,7 @@ void testEndpoint(vesper::HttpConnection& c) {
 }
 ```
 
-# Installation
+# Installation - Linux
 Add this to your CMakeLists
 
 ```CMake
@@ -82,7 +82,11 @@ Or if you want a manually downloaded Version
     target_link_libraries(test PRIVATE vesper::vesper)
 ```
 
-# Documentation  
+# Installation - Windows
+We currently don't have native Windows support, but you can use the docker folder (Dockerfile)
+as a starting point for your project, so it can run cross plattform
+
+# Documentation
 **Important**
 For further documentation download the repository and open the sphinx documentation 
 under the build folder (e.g. on Linux then run ./docs.sh)

@@ -16,8 +16,8 @@ Requirements/Recommendations for using Vesper
 - CMake
 - Ninja (any other CMake Generator is also fine)
 
-Installation
-============
+Installation - Linux
+====================
 
 | **For basic use**
 | Add this to your CMakeLists
@@ -44,8 +44,16 @@ Installation
     
     add_subdirectory(libs/vesper)    
     target_link_libraries(test PRIVATE vesper::vesper)
+
+Installation - Windows
+======================
+
+| We currently don't have native Windows support, but you can use the docker folder (Dockerfile)
+| as a starting point for your project, so it can run cross plattform
     
-| **For Development**
+Installation - For Contributors
+===============================
+
 | 1. Download the library (git clone git@github.com:X3NON-11/Vesper.git)
 | 2. Go into the folder and then you are already done
 | => Recommended: The CMakeLists is set up so you build a library and executable (for testing), so for ease of testing you can use the main.cpp under Vesper/examples

@@ -1,0 +1,12 @@
+[INFO] 2026/03/11 - 13:32:35 | GET /
+[INFO] 2026/03/11 - 13:32:35 | GET /test
+[INFO] 2026/03/11 - 13:32:35 | GET /test
+[INFO] 2026/03/11 - 13:32:35 | GET /hello
+[INFO] 2026/03/11 - 13:32:35 | POST /post
+[INFO] 2026/03/11 - 13:32:35 | GET /query
+[INFO] 2026/03/11 - 13:32:35 | GET /header
+[INFO] 2026/03/11 - 13:32:35 | GET /cookies
+[INFO] 2026/03/11 - 13:32:35 | ALL /user
+[INFO] 2026/03/11 - 13:32:35 | GET /user/:id
+[INFO] 2026/03/11 - 13:32:35 | GET /user/:id
+[INFO] 2026/03/11 - 13:32:35 | GET /user/test
