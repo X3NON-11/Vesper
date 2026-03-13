@@ -1,7 +1,7 @@
 FROM archlinux:latest AS build
 
 RUN bash -c 'yes y | pacman -Sy base-devel cmake git ninja'
-COPY --exclude=build/ --exclude=docker/ --from=parent . /source
+COPY  --from=parent . /source
 WORKDIR ["/source"]
 RUN ls /source && mkdir -p /source/build && cd /source/build && cmake -G Ninja /source
 WORKDIR ["/source/build"]
