@@ -336,18 +336,18 @@ void HttpConnection::setCookie(std::string name, std::string value, int maxAge,
 
     header("Set-Cookie", cookie.str());
 }
-
 void HttpConnection::setCookie(std::string name, std::string value, int maxAge,
                                bool secure, bool httpOnly) {
-    setCookie(name, value, maxAge, request.path, domain, secure, httpOnly);
+    setCookie(name, value, maxAge, request.path, "", secure, httpOnly);
 }
 void HttpConnection::setCookie(std::string name, std::string value, bool secure,
                                bool httpOnly) {
-    setCookie(name, value, -1, request.path, domain, secure, httpOnly);
+    setCookie(name, value, -1, request.path, "", secure, httpOnly);
 }
 void HttpConnection::setCookie(std::string name, std::string value) {
-    setCookie(name, value, -1, request.path, domain, false, false);
+    setCookie(name, value, -1, request.path, "", false, false);
 }
+
 std::string HttpConnection::cookies(std::string name) {
     std::string rawHeader = getHeader("Cookie");
     if (rawHeader.empty())

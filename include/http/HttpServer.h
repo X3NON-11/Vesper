@@ -44,7 +44,7 @@ namespace vesper {
             void GET(std::string endpoint, Handlers&&... handlers) {
                 std::vector<std::function<void(HttpConnection&)>> chain = { std::forward<Handlers>(handlers)...};
                 for (int i = 0; i + 1 < chain.size(); i++) {
-                    setMiddleware(endpoint, "GET", true, chain[i]);
+                    setMiddleware(endpoint, "GET", true,  chain[i]);
                 }
                 createEndpoint("GET", endpoint, chain.back());
             }
@@ -169,7 +169,6 @@ namespace vesper {
                 std::vector<std::function<void(HttpConnection&)>> chain = { std::forward<Handlers>(handlers)...};
                 for (int i = 0; i < chain.size(); i++) {
                     middlewares.push_back(std::move(chain[i]));
-                    log(LogType::Info, "ALL " + prefix);
                 }
             }
         
@@ -178,12 +177,13 @@ namespace vesper {
             template<typename... Handlers>
             void GET(std::string endpoint, Handlers&&... handlers) {
                 std::string validatedPath = validatePath(endpoint);
-                // apply group middleware first
-                for (auto& mw : middlewares) {
-                    server.setMiddleware(validatedPath, "GET", true,  mw);
-                }
-                // forward handlers
-                server.GET(validatedPath, std::forward<Handlers>(handlers)...);
+            
+                // Start with router's middleware
+                std::vector<std::function<void(HttpConnection&)>> chain = middlewares;
+                // Append the new handlers
+                (chain.emplace_back(std::forward<Handlers>(handlers)), ...);
+            
+                server.GET(validatedPath, chain.begin(), chain.end());
             }
             template<typename... Handlers>
             void POST(std::string endpoint, Handlers&&... handlers) {

@@ -12,6 +12,7 @@ void queryHandler(vesper::HttpConnection &c);
 void userIdHandler(vesper::HttpConnection &c);
 void headerHandler(vesper::HttpConnection &c);
 void cookies(vesper::HttpConnection &c);
+void multipleParams(vesper::HttpConnection &c);
 
 int main() {
     debugging = true;      // Default on
@@ -29,6 +30,7 @@ int main() {
     server.GET("/query", queryHandler);
     server.GET("/header", headerHandler);
     server.GET("/cookies", cookies);
+    server.GET("/:one/:two/:three", multipleParams);
     // server.staticFile("/asset", "PicturePath");
     // server.staticDir("/asset", "PicturesPath");
 
@@ -113,3 +115,12 @@ void cookies(vesper::HttpConnection &c) {
 }
 
 void hello(vesper::HttpConnection &c) { c.string("Hello World"); }
+
+void multipleParams(vesper::HttpConnection &c) {
+    if (c.param("one") == "one" && c.param("two") == "two" &&
+        c.param("three") == "three") {
+        c.string("go");
+        return;
+    }
+    c.string("invalid");
+}

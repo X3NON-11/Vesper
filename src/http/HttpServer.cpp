@@ -392,7 +392,6 @@ void HttpServer::setMiddleware(std::string endpoint, std::string method,
                                bool prefix,
                                std::function<void(HttpConnection &)> handler) {
     middlewareTree.addURL(endpoint, method, prefix, handler);
-    log(LogType::Info, method + " " + endpoint);
 }
 
 // Recursive function that goes through every Middleware to decide
@@ -426,7 +425,9 @@ namespace vesper {
 // Responsible for server.group()
 // Works by reusing HttpServer() functions just with the correct prefix
 Router::Router(HttpServer &server, std::string prefix)
-    : server(server), prefix(prefix) {}
+    : server(server), prefix(prefix) {
+    log(LogType::Info, "ALL " + prefix);
+}
 
 std::string Router::validatePath(std::string endpoint) {
     std::string path = endpoint;
