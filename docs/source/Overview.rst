@@ -29,7 +29,7 @@ Installation - Linux
     FetchContent_Declare(
       vesper
       GIT_REPOSITORY https://github.com/X3NON-11/Vesper
-      GIT_TAG prerelease_0.95
+      GIT_TAG v1.0
     )
     
     FetchContent_MakeAvailable(vesper)

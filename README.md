@@ -65,7 +65,7 @@ Add this to your CMakeLists
     FetchContent_Declare(
       vesper
       GIT_REPOSITORY https://github.com/X3NON-11/Vesper
-      GIT_TAG prerelease_0.95
+      GIT_TAG v1.0
     )
     
     FetchContent_MakeAvailable(vesper)
@@ -145,4 +145,13 @@ vesper::Router g = server.group("/test");
 Can be for example used when autherization failed and you want to send the user to the home page. Then you can use c.redirect("/") to redirect him
 ```C++
 c.redirect("/");
+```
+
+**Cookies**
+Useful when making a website that requires authentication. Then you can using setCookie() set a header which with every request gets sent from the browser,
+enabiling you to retrieve that data using the cookies() function.
+```C++
+c.setCookie("test", "1234");
+// After reconnecting cookie will be "1234"
+std::string cookie = c.cookies("test");
 ```

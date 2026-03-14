@@ -3,6 +3,7 @@ FROM archlinux:latest AS build
 RUN bash -c 'yes y | pacman -Sy base-devel cmake git ninja'
 COPY  --from=parent . /source
 WORKDIR ["/source"]
+RUN rm -rf /source/build
 RUN ls /source && mkdir -p /source/build && cd /source/build && cmake -G Ninja /source
 WORKDIR ["/source/build"]
 RUN cmake --build /source/build 

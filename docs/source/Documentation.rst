@@ -74,3 +74,13 @@ Documentation
 .. code-block:: cpp
 
     c.redirect("/");
+    
+| **Cookies**
+| Useful when making a website that requires authentication. Then you can using setCookie() set a header which with every request gets sent from the browser,
+| enabiling you to retrieve that data using the cookies() function.
+
+.. code-block:: cpp
+
+    c.setCookie("test", "1234");
+    // After reconnecting cookie will be "1234"
+    std::string cookie = c.cookies("test");
