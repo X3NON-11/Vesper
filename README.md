@@ -17,6 +17,7 @@
 - get client headers (e.g. Auth Headers)
 - router groups
 - redirects
+- cookies
 
 # How to use
 ```c++
