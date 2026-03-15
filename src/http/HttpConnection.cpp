@@ -1,5 +1,5 @@
-#include "../include/http/HttpConnection.h"
-#include "../include/http/HttpServer.h" // In cpp to avoid circular include
+#include "../include/vesper/http/HttpConnection.h"
+#include "../include/vesper/http/HttpServer.h" // In cpp to avoid circular include
 
 namespace vesper {
 // =====================================================
