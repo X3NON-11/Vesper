@@ -9,9 +9,12 @@
 #include <functional>
 #include <filesystem>
 
+#include "threadPool.h"
+
 inline bool debugging = true;
 inline bool ignoreWarnings = true;
 inline std::ofstream file;
+inline threadPool logThread;
 
 enum class LogType {
     Error,
@@ -38,6 +41,7 @@ inline void setupLogger() {
 
 inline void closeLogger() {
     if (file.is_open()) file.close();
+    logThread.stop();
 }
 
 // Get formatted timestamp like Gin: 2026/02/08 - 21:33:54
@@ -52,7 +56,7 @@ inline std::string currentTime() {
     return std::string(buffer);
 }
 
-inline void log(LogType type, const std::string& message) {
+inline void logOnCurrentThread(LogType type, const std::string& message) {
     if (!debugging) return;
 
     std::string dt = currentTime();
@@ -100,14 +104,15 @@ inline void log(LogType type, const std::string& message) {
             break;
     }
 }
-
-// Optional shorthand for simple logging like Gin
+inline void log(LogType type, const std::string& message) {
+    logThread.newTask([type, message]() {logOnCurrentThread(type, message); });
+}
 inline void log(const std::string& message) {
-    log(LogType::Info, message);
+    logThread.newTask([message]() {logOnCurrentThread(LogType::Info, message); });
 }
 
 // Used for the message when a client connected
-inline void logConnection(int status, const std::string& method, const std::string& endpoint) {
+inline void logConnectionOnThisThread(int status, const std::string& method, const std::string& endpoint) {
     if (!debugging) return;
     std::string dt = currentTime();
     std::string color;
@@ -134,4 +139,7 @@ inline void logConnection(int status, const std::string& method, const std::stri
         file << output << '\n';
         file.flush();
     }
+}
+inline void logConnection(int status, const std::string& method, const std::string& endpoint) {
+    logThread.newTask([status, method, endpoint]() {logConnectionOnThisThread(status, method, endpoint); });
 }

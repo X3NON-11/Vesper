@@ -321,20 +321,31 @@ void HttpConnection::redirect(int statuscode, std::string endpoint) {
 void HttpConnection::setCookie(std::string name, std::string value, int maxAge,
                                std::string path, std::string domain,
                                bool secure, bool httpOnly) {
-    std::ostringstream cookie;
-    cookie << name << "=" << value;
-    if (maxAge >= 0)
-        cookie << "; Max-Age=" << maxAge;
-    if (!path.empty())
-        cookie << "; Path=" << path;
-    if (!domain.empty())
-        cookie << "; Domain=" << domain;
-    if (secure)
-        cookie << "; Secure";
-    if (httpOnly)
-        cookie << "; HttpOnly";
+    std::string cookie;
+    cookie.reserve(1024);
 
-    header("Set-Cookie", cookie.str());
+    cookie.append(name);
+    cookie.append("=");
+    cookie.append(value);
+
+    if (maxAge >= 0) {
+        cookie.append("; Max-Age=");
+        cookie.append(std::to_string(maxAge));
+    }
+    if (!path.empty()) {
+        cookie.append("; Path=");
+        cookie.append(path);
+    }
+    if (!domain.empty()) {
+        cookie.append("; Domain=");
+        cookie.append(domain);
+    }
+    if (secure)
+        cookie.append("; Secure");
+    if (httpOnly)
+        cookie.append("; HttpOnly");
+
+    header("Set-Cookie", cookie);
 }
 void HttpConnection::setCookie(std::string name, std::string value, int maxAge,
                                bool secure, bool httpOnly) {
