@@ -1,10 +1,12 @@
 #include "../include/vesper/utils/threadPool.h"
 
-threadPool::threadPool() {
-    // Max available threads
-    const uint32_t numThreads = std::thread::hardware_concurrency();
-    for (uint32_t i = 0; i < numThreads; i++) {
-        threads.emplace_back(std::thread(&threadPool::threadLoop, this));
+threadPool::threadPool(int numThreads) {
+    if (numThreads < 1) {
+        numThreads = std::thread::hardware_concurrency();
+    }
+
+    for (int i = 0; i < numThreads; i++) {
+        threads.emplace_back(&threadPool::threadLoop, this);
     }
 }
 

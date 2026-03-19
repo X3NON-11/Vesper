@@ -19,7 +19,7 @@ class threadPool {
         
         void threadLoop();
     public:
-        threadPool();
+        threadPool(int numThreads);
         
         void newTask(std::function<void()> handler);
         void stop();

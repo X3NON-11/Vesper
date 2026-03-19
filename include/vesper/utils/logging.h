@@ -14,7 +14,7 @@
 inline bool debugging = true;
 inline bool ignoreWarnings = true;
 inline std::ofstream file;
-inline threadPool logThread;
+inline threadPool logThread(1);
 
 enum class LogType {
     Error,

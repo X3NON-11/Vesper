@@ -18,6 +18,7 @@ void TcpServer::closeServer() {
     if (listenSocket >= 0) {
         close(listenSocket);
     }
+    closeLogger();
 }
 
 // Sets up a basic Tcp Socket

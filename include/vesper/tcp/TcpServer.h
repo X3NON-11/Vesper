@@ -26,7 +26,7 @@ namespace vesper {
         protected: // Allows acces for subclasses
             int listenSocket; // Socket that listens for new connections
             int port; // The port the listenSocket runs on
-            threadPool threads;
+            threadPool threads{0}; // under 1 it just takes the maximum ammount of threads on the system
 
         public:
             TcpServer(); // Only creates a object
