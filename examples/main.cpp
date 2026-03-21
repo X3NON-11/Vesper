@@ -13,13 +13,14 @@ void userIdHandler(vesper::HttpConnection &c);
 void headerHandler(vesper::HttpConnection &c);
 void cookies(vesper::HttpConnection &c);
 void multipleParams(vesper::HttpConnection &c);
+void error(vesper::HttpConnection &c);
 
 int main() {
     debugging = true;      // Default on
     ignoreWarnings = true; // Default off
 
     // Start the server
-    vesper::HttpServer server;
+    vesper::HttpServer server(vesper::Default);
 
     // Route handlers
     // server.setMiddleware("/test", "ALL", testMiddleware);
@@ -31,6 +32,7 @@ int main() {
     server.GET("/header", headerHandler);
     server.GET("/cookies", cookies);
     server.GET("/:one/:two/:three", multipleParams);
+    server.GET("/error", error);
     // server.staticFile("/asset", "PicturePath");
     // server.staticDir("/asset", "PicturesPath");
 
@@ -66,7 +68,7 @@ void myHandler(vesper::HttpConnection &c) {
         </html>
     )";
 
-    c.data("text/html", Status::OK, html);
+    c.data("text/html", vesper::OK, html);
 }
 
 // Test endpoint: return JSON
@@ -123,4 +125,9 @@ void multipleParams(vesper::HttpConnection &c) {
         return;
     }
     c.string("invalid");
+}
+
+void error(vesper::HttpConnection &c) {
+    throw std::runtime_error("This is a error");
+    c.string("Shouldnt get sent");
 }

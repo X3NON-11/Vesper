@@ -7,7 +7,13 @@ namespace vesper {
 // HTTP-SERVER
 // ===========
 
-HttpServer::HttpServer() : TcpServer() {}
+HttpServer::HttpServer() : TcpServer() {
+    use(loggingMiddleware, recoveryMiddleware);
+}
+HttpServer::HttpServer(vesper::HttpServerTypes constructor) : TcpServer() {
+    if (constructor == vesper::HttpServerTypes::Default)
+        use(loggingMiddleware, recoveryMiddleware);
+}
 
 // Close server automatically
 HttpServer::~HttpServer() {
@@ -33,8 +39,8 @@ async::Task HttpServer::onClient(int client) {
     Context ctx{};
     ctx.buffer.resize(4096);
 
-    // Getting what endpoint, method client has/wants to later run the correct
-    // handler Receive data from client;
+    // Getting what endpoint, method client has/wants to later run the
+    // correct handler Receive data from client;
     while (ctx.request.find("\r\n\r\n") == std::string::npos) {
         // int r = recv(client, buffer.data(), buffer.size(), 0);
         int r = co_await async::RecvAwaiter{client, ctx.buffer.data(),
@@ -181,8 +187,8 @@ void HttpServer::handleRequest(int client, HttpConnection &connection,
     std::string http = connection.response.toHttpString();
     send(client, http.c_str(), http.size(), 0);
     close(client);
-    logConnection(static_cast<int>(connection.response.status),
-                  connection.response.method, connection.request.path);
+    // logConnection(static_cast<int>(connection.response.status),
+    //               connection.response.method, connection.request.path);
 }
 
 // Header Parsing

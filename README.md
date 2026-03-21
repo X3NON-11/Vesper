@@ -18,6 +18,7 @@
 - router groups
 - redirects
 - cookies
+- logging & recovery middleware
 
 # How to use
 ```c++
@@ -55,6 +56,11 @@ void testEndpoint(vesper::HttpConnection& c) {
     c.json(json);
     // c.data("application/json", Status::OK, json); Also possible
 }
+```
+
+If you don't want the recovery and logging middleware you can on server creation do
+```C++
+vesper::HttpServer server(vesper::New);
 ```
 
 # Installation - Linux

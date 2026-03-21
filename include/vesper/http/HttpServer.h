@@ -14,6 +14,7 @@
 #include "../async/eventLoop.h"
 #include "../async/task.h"
 #include "../async/eventLoop_fwd.h"
+#include "../http/defaultMiddleware.h"
 
 #include <zlib.h>           // Compress static files
 
@@ -21,11 +22,16 @@ namespace vesper {
     class Router;
 }
 namespace vesper {
+    enum class HttpServerTypes {
+        Default,
+        New
+    };
     // All abstractions for the httpServer itself
     // This for the library user is the server (he interacts with) & starting point of everything else
     class HttpServer : public TcpServer {
         public:
             HttpServer();
+            HttpServer(HttpServerTypes constructor);
             ~HttpServer();
             std::string domain = "";
             void run(std::string ipAddress, int port); // Runs startServer & runServer on a different thread
@@ -33,6 +39,7 @@ namespace vesper {
             void onError(std::function<void()> h) {
                 errorHandler = std::move(h);
             }
+        
             // Groups together endpoints/middleware
             vesper::Router group(std::string endpoint);
             // Serve static files for performance
@@ -103,12 +110,12 @@ namespace vesper {
             void use(Handlers&&... handlers) {
                 std::vector<std::function<void(HttpConnection&)>> chain = { std::forward<Handlers>(handlers)...};
                 for (int i = 0; i < chain.size(); i++) {
-                    middlewareTree.addURL("/", "ALL", true, chain[i]);
-                    log(LogType::Info,  "ALL /");
+                    setMiddleware("/", "ALL", true, chain[i]);
                 }
             }
            
-            void setMiddleware(std::string endpoint, std::string method, bool prefix, std::function<void(HttpConnection &)> handler); // Create a middleware for one endpoint
+            // Create a middleware for one endpoint
+            void setMiddleware(std::string endpoint, std::string method, bool prefix, std::function<void(HttpConnection &)> handler);
 
         private:
             std::thread serverThread; // The thread the server/socket uses
