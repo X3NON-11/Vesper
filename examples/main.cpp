@@ -7,6 +7,7 @@ void myHandler(vesper::HttpConnection &c);
 void hello(vesper::HttpConnection &c);
 void testEndpoint(vesper::HttpConnection &c);
 void testMiddleware(vesper::HttpConnection &c);
+void secondMiddleware(vesper::HttpConnection &c);
 void postEndpoint(vesper::HttpConnection &c);
 void queryHandler(vesper::HttpConnection &c);
 void userIdHandler(vesper::HttpConnection &c);
@@ -24,8 +25,9 @@ int main() {
 
     // Route handlers
     // server.setMiddleware("/test", "ALL", testMiddleware);
-    server.GET("/", myHandler);                        // Website endpoint
-    server.GET("/test", testMiddleware, testEndpoint); // JSON endpoint
+    server.GET("/", myHandler); // Website endpoint
+    server.GET("/test", testMiddleware, secondMiddleware,
+               testEndpoint); // JSON endpoint
     server.GET("/hello", hello);
     server.POST("/post", postEndpoint);
     server.GET("/query", queryHandler);
@@ -88,6 +90,12 @@ void testMiddleware(vesper::HttpConnection &c) {
     c.string("Middleware Started\n\n");
     c.next();
     c.string("\n\nMiddleware Ended\n");
+}
+
+void secondMiddleware(vesper::HttpConnection &c) {
+    c.string("Second Middleware Started\n\n");
+    c.next();
+    c.string("\n\nSecond Middleware Ended\n");
 }
 
 void postEndpoint(vesper::HttpConnection &c) {

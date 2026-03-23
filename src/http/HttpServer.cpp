@@ -7,12 +7,9 @@ namespace vesper {
 // HTTP-SERVER
 // ===========
 
-HttpServer::HttpServer() : TcpServer() {
-    use(loggingMiddleware, recoveryMiddleware);
-}
 HttpServer::HttpServer(vesper::HttpServerTypes constructor) : TcpServer() {
     if (constructor == vesper::HttpServerTypes::Default)
-        use(loggingMiddleware, recoveryMiddleware);
+        use(recoveryMiddleware, loggingMiddleware);
 }
 
 // Close server automatically
@@ -173,8 +170,8 @@ void HttpServer::handleRequest(int client, HttpConnection &connection,
     runMiddlewareChain(connection, middlewares, 0, [&]() {
         if (endpointsTree.matchURL(ctx.endpointStr, ctx.method)) {
             auto h = endpointsTree.getNodeHandler(ctx.endpointStr, ctx.method);
-            if (h) {
-                h(connection);
+            if (!h.empty()) {
+                h.back()(connection);
                 handled = true;
             }
         }
@@ -245,7 +242,6 @@ vesper::Router HttpServer::group(std::string endpoint) {
 }
 
 void HttpServer::staticDir(std::string endpoint, std::string folder) {
-
     if (!std::filesystem::exists(folder) ||
         !std::filesystem::is_directory(folder)) {
         log(LogType::Warn,

@@ -12,7 +12,7 @@ Tree::Tree() {
 void Tree::addURL(std::string url, std::string method, bool prefix,
                   std::function<void(vesper::HttpConnection &)> handler) {
     if (url == "/") {
-        root->handlers[method] = handler;
+        root->handlers[method].push_back(handler);
         root->prefix = prefix;
         return;
     }
@@ -53,7 +53,7 @@ void Tree::addURL(std::string url, std::string method, bool prefix,
 
         if (slash == std::string::npos) {
             // Last segment: set the handler
-            current->handlers[method] = handler;
+            current->handlers[method].push_back(handler);
             current->prefix = prefix;
             return;
         }
@@ -61,16 +61,17 @@ void Tree::addURL(std::string url, std::string method, bool prefix,
     }
 }
 
-std::function<void(vesper::HttpConnection &)>
+std::vector<std::function<void(vesper::HttpConnection &)>>
 Tree::getNodeHandler(std::string url, std::string method) {
 
-    if (!root) {
-        return nullptr;
-    }
+    if (!root)
+        return {};
 
     if (url == "/") {
-        auto h = root->handlers.find(method);
-        return (h != root->handlers.end()) ? h->second : nullptr;
+        auto it = root->handlers.find(method);
+        if (it != root->handlers.end())
+            return it->second;
+        return {};
     }
 
     if (!url.empty() && url[0] == '/') {
@@ -78,12 +79,14 @@ Tree::getNodeHandler(std::string url, std::string method) {
     }
 
     Node *node = matchNode(url, root.get(), 0);
-    if (!node) {
-        return nullptr;
-    }
+    if (!node)
+        return {};
 
-    auto h = node->handlers.find(method);
-    return (h != node->handlers.end()) ? h->second : nullptr;
+    auto it = node->handlers.find(method);
+    if (it != node->handlers.end())
+        return it->second;
+
+    return {};
 }
 
 bool Tree::matchURL(std::string url, std::string method) {
@@ -158,6 +161,7 @@ bool Tree::matchPrefixURL(std::string url, std::string method) {
 void Tree::collectPrefixHandlers(
     std::string url, std::string method,
     std::vector<std::function<void(vesper::HttpConnection &)>> &out) {
+
     if (!url.empty() && url[0] == '/') {
         url.erase(0, 1);
     }
@@ -166,10 +170,15 @@ void Tree::collectPrefixHandlers(
 
     // Root middleware
     if (current->prefix || url.empty()) {
-        if (current->handlers.count(method))
-            out.push_back(current->handlers[method]);
-        else if (current->handlers.count("ALL"))
-            out.push_back(current->handlers["ALL"]);
+        auto it = current->handlers.find(method);
+        if (it != current->handlers.end()) {
+            out.insert(out.end(), it->second.begin(), it->second.end());
+        } else {
+            auto all = current->handlers.find("ALL");
+            if (all != current->handlers.end()) {
+                out.insert(out.end(), all->second.begin(), all->second.end());
+            }
+        }
     }
 
     int start = 0;
@@ -193,14 +202,21 @@ void Tree::collectPrefixHandlers(
 
         // Root middleware (only if prefix == true)
         if (current->prefix) {
-            if (current->handlers.count(method))
-                out.push_back(current->handlers[method]);
-            else if (current->handlers.count("ALL"))
-                out.push_back(current->handlers["ALL"]);
+            auto it2 = current->handlers.find(method);
+            if (it2 != current->handlers.end()) {
+                out.insert(out.end(), it2->second.begin(), it2->second.end());
+            } else {
+                auto all = current->handlers.find("ALL");
+                if (all != current->handlers.end()) {
+                    out.insert(out.end(), all->second.begin(),
+                               all->second.end());
+                }
+            }
         }
 
         if (slash == std::string::npos)
             break;
+
         start = slash + 1;
     }
 }

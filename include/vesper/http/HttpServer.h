@@ -30,8 +30,7 @@ namespace vesper {
     // This for the library user is the server (he interacts with) & starting point of everything else
     class HttpServer : public TcpServer {
         public:
-            HttpServer();
-            HttpServer(HttpServerTypes constructor);
+            HttpServer(vesper::HttpServerTypes constructor = vesper::HttpServerTypes::Default);
             ~HttpServer();
             std::string domain = "";
             void run(std::string ipAddress, int port); // Runs startServer & runServer on a different thread

@@ -18,7 +18,7 @@ TEST(getNodeHandler, ExpectSuccess) {
     t.addURL("/test/case", "GET", false,
              [](vesper::HttpConnection &) { return; });
     auto node = t.getNodeHandler("/test/case", "GET");
-    EXPECT_TRUE(node);
+    EXPECT_TRUE(node.back());
 }
 
 TEST(matchURL, ExpectSuccess) {
