@@ -1,3 +1,11 @@
+#!/usr/bin/env bash
+
+if [ ! -d ".venv" ]; then
+  python3 -m venv .venv
+fi
+
 source .venv/bin/activate
-bash -c 'sleep 1; xdg-open http://localhost:8000' &
+pip install -q sphinx sphinx-autobuild furo
+
+xdg-open http://localhost:8000 &
 sphinx-autobuild source build/html

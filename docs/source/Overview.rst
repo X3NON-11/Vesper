@@ -1,5 +1,5 @@
 Overview
-=======
+========
 
 | **Purpose of Vesper**
 | Vesper is an HTTP server library for C++ inspired by Gin (a popular Go library). It was created to fill the gap of similar, easy-to-use libraries in C++ with clean and intuitive syntax.
@@ -29,7 +29,6 @@ Installation - Linux
     FetchContent_Declare(
       vesper
       GIT_REPOSITORY https://github.com/X3NON-11/Vesper
-      GIT_TAG v1.0
     )
     
     FetchContent_MakeAvailable(vesper)
