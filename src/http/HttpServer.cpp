@@ -14,9 +14,11 @@ HttpServer::HttpServer(vesper::HttpServerTypes constructor) : TcpServer() {
 
 // Close server automatically
 HttpServer::~HttpServer() {
-    if (serverThread.joinable()) {
+    if (serverThread.joinable())
         serverThread.join();
-    }
+
+    if (asyncThread.joinable())
+        asyncThread.join();
 }
 
 // Sets up & runs the server using the previously created objects
@@ -26,7 +28,8 @@ void HttpServer::run(std::string ipAddress, int port) {
     domain = ipAddress;
     startServer(domain, port);
     serverThread = std::thread(&TcpServer::runServer, this);
-    async::EventLoop::instance().loop();
+    asyncThread =
+        std::thread([] { vesper::async::EventLoop::instance().loop(); });
 }
 
 // Decides when & at what endpoint to run the handlers
@@ -39,16 +42,23 @@ async::Task HttpServer::onClient(int client) {
     // Getting what endpoint, method client has/wants to later run the
     // correct handler Receive data from client;
     while (ctx.request.find("\r\n\r\n") == std::string::npos) {
-        // int r = recv(client, buffer.data(), buffer.size(), 0);
-        int r = co_await async::RecvAwaiter{client, ctx.buffer.data(),
-                                            ctx.buffer.size()};
-        if (r > 0) {
-            ctx.request.append(ctx.buffer.data(), r);
-        } else if (r == 0) {
-            log(LogType::Warn, "Client closed connection");
+        auto res = co_await async::RecvAwaiter{client, ctx.buffer.data(),
+                                               ctx.buffer.size()};
+
+        switch (res.status) {
+        case async::RecvResult::Status::Ok:
+            ctx.request.append(ctx.buffer.data(), res.value);
+            break;
+
+        case async::RecvResult::Status::Closed:
+            log(LogType::Warn, "Client closed during body");
             close(client);
             co_return;
-        } else { // r < 0
+
+        case async::RecvResult::Status::Retry:
+            continue;
+
+        case async::RecvResult::Status::Error:
             log(LogType::Warn, "recv error");
             co_return;
         }
@@ -97,15 +107,23 @@ async::Task HttpServer::onClient(int client) {
     ctx.postData = ctx.body;
     auto start = std::chrono::steady_clock::now();
     while (ctx.postData.size() < ctx.contentLength) {
-        int r = co_await async::RecvAwaiter{client, ctx.buffer.data(),
-                                            ctx.buffer.size()};
-        if (r > 0) {
-            ctx.postData.append(ctx.buffer.data(), r);
-        } else if (r == 0) {
+        auto res = co_await async::RecvAwaiter{client, ctx.buffer.data(),
+                                               ctx.buffer.size()};
+
+        switch (res.status) {
+        case async::RecvResult::Status::Ok:
+            ctx.postData.append(ctx.buffer.data(), res.value);
+            break;
+
+        case async::RecvResult::Status::Closed:
             log(LogType::Warn, "Client closed during body");
             close(client);
             co_return;
-        } else {
+
+        case async::RecvResult::Status::Retry:
+            continue;
+
+        case async::RecvResult::Status::Error:
             log(LogType::Warn, "recv error");
             co_return;
         }
@@ -402,7 +420,6 @@ void HttpServer::runMiddlewareChain(
     HttpConnection &c, std::vector<std::function<void(HttpConnection &)>> &mws,
     size_t index, std::function<void()> finalHandler) {
     if (index >= mws.size()) {
-        // threads.newTask([finalHandler]() { finalHandler(); });
         finalHandler();
         return;
     }

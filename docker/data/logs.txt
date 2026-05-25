@@ -1,11 +1,13 @@
-[INFO] 2026/03/29 - 11:45:16 | GET /
-[INFO] 2026/03/29 - 11:45:16 | GET /test
-[INFO] 2026/03/29 - 11:45:16 | GET /hello
-[INFO] 2026/03/29 - 11:45:16 | POST /post
-[INFO] 2026/03/29 - 11:45:16 | GET /query
-[INFO] 2026/03/29 - 11:45:16 | GET /header
-[INFO] 2026/03/29 - 11:45:16 | GET /cookies
-[INFO] 2026/03/29 - 11:45:16 | GET /:one/:two/:three
-[INFO] 2026/03/29 - 11:45:16 | GET /error
-[INFO] 2026/03/29 - 11:45:16 | ALL /user
-[INFO] 2026/03/29 - 11:45:16 | GET /user/:id
+[INFO] 2026/05/24 - 09:02:31 | GET /
+[INFO] 2026/05/24 - 09:02:31 | GET /test
+[INFO] 2026/05/24 - 09:02:31 | GET /hello
+[INFO] 2026/05/24 - 09:02:31 | POST /post
+[INFO] 2026/05/24 - 09:02:31 | GET /query
+[INFO] 2026/05/24 - 09:02:31 | GET /header
+[INFO] 2026/05/24 - 09:02:31 | GET /cookies
+[INFO] 2026/05/24 - 09:02:31 | GET /:one/:two/:three
+[INFO] 2026/05/24 - 09:02:31 | GET /error
+[INFO] 2026/05/24 - 09:02:31 | ALL /user
+[INFO] 2026/05/24 - 09:02:31 | GET /user/:id
+[INFO] 2026/05/24 - 09:02:31 | GET /user/test
+[VESPER] - 2026/05/24 - 09:02:34 | [32m200[0m | GET "/"

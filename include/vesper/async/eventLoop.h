@@ -3,65 +3,92 @@
 #include <sys/epoll.h>
 #include <unistd.h>
 #include <stdexcept>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "eventLoop_fwd.h"
+#include "../utils/logging.h"
+#include "../utils/threadPool.h"
 
 namespace vesper::async {
 
 class EventLoop {
 public:
-    static constexpr int MAX_EVENTS = 64;
-
+    #define MAX_EVENTS 64
+    
     static EventLoop& instance() {
         static EventLoop loop;
         return loop;
     }
 
-    void watchRead(int fd, std::coroutine_handle<> h) {
-        epoll_event ev{};
+    void registerFD(int fd, std::coroutine_handle<> h) {
+        std::lock_guard lock(mtx);
+    
+        sockMap[fd] = h;
+    
+        struct epoll_event ev{};
         ev.events = EPOLLIN;
-        ev.data.ptr = h.address();
-        epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev);
-    }
-
-    void watchWrite(int fd, std::coroutine_handle<> h) {
-        epoll_event ev{};
-        ev.events = EPOLLOUT | EPOLLET;
-        ev.data.ptr = h.address();
-        int ret = epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev);
-        
-        if (ret < 0) {
-            log(LogType::Warn, "epoll_ctl watchWrite");
+        ev.data.fd = fd;
+    
+        if (epoll_ctl(epollFD, EPOLL_CTL_ADD, fd, &ev) == -1) {
+            if (errno == EEXIST) {
+                epoll_ctl(epollFD, EPOLL_CTL_MOD, fd, &ev);
+            }
         }
     }
 
-    void unwatch(int fd) {
-        epoll_ctl(epfd, EPOLL_CTL_DEL, fd, nullptr);
-    }
-    
     void loop() {
+        struct epoll_event events[MAX_EVENTS];
+        threadPool threads{0};
+
         while (true) {
-            int n = epoll_wait(epfd, events, MAX_EVENTS, -1);
+            int n = epoll_wait(epollFD, events, MAX_EVENTS, -1);
+    
+            if (n == -1) {
+                if (errno == EINTR) continue;
+                log(LogType::Error, "epoll_wait failed");
+                continue;
+            }
+    
             for (int i = 0; i < n; i++) {
-                auto h = std::coroutine_handle<>::from_address(events[i].data.ptr);
-                h.resume();
+                int fd = events[i].data.fd;
+            
+                std::coroutine_handle<> h;
+                
+                {
+                    std::lock_guard lock(mtx);
+                
+                    auto it = sockMap.find(fd);
+                    if (it == sockMap.end()) continue;
+                
+                    h = it->second;
+                    sockMap.erase(it);
+                }
+                
+                if (h && !h.done()) {
+                    threads.newTask([h] {
+                        h.resume();
+                    });
+                }
             }
         }
     }
 
 private:
+    std::mutex mtx;
+    std::unordered_map<int, std::coroutine_handle<>> sockMap; // fd, coroutine_handle
+    int epollFD;
+    
     EventLoop() {
-        epfd = epoll_create1(0);
-        if (epfd < 0)
-            throw std::runtime_error("epoll_create1 failed");
+        epollFD = epoll_create1(0);
+        if (epollFD == -1) {
+            log(LogType::Error, "epoll_create1 failed");
+        }
     }
 
     ~EventLoop() {
-        close(epfd);
+        
     }
-
-    int epfd;
-    epoll_event events[MAX_EVENTS];
 };
 
 }

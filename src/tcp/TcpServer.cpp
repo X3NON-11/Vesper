@@ -70,15 +70,20 @@ int TcpServer::startServer(std::string ipAddress, int port) {
         return -1;
     }
 
+    setSocketNonBlocking(listenSocket);
+
     return 0;
 }
 
 async::Task TcpServer::runServer() {
     while (true) {
-        int client = co_await async::AcceptAwaiter{listenSocket};
-
-        if (client < 0)
+        auto res = co_await async::AcceptAwaiter{listenSocket};
+        if (res.status == async::AcceptResult::Status::Retry)
             continue;
+        if (res.status == async::AcceptResult::Status::Error)
+            continue;
+
+        int client = res.fd;
 
         setSocketNonBlocking(client);
 
@@ -97,14 +102,14 @@ async::Task TcpServer::onClient(int client) {
 }
 
 // Functions that use Linux only functions
-bool TcpServer::setSocketNonBlocking(int client) {
-    int flags = fcntl(client, F_GETFL, 0);
+bool TcpServer::setSocketNonBlocking(int socket) {
+    int flags = fcntl(socket, F_GETFL, 0);
     if (flags == -1) {
         log(LogType::Warn, "fcntl F_GETFL");
         return false;
     }
 
-    if (fcntl(client, F_SETFL, flags | O_NONBLOCK) == -1) {
+    if (fcntl(socket, F_SETFL, flags | O_NONBLOCK) == -1) {
         log(LogType::Warn, "fcntl F_SETFL");
         return false;
     }

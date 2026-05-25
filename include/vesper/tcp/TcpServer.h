@@ -44,7 +44,7 @@ namespace vesper {
             void closeServer();
             
             // Functions that use Linux only functions
-            bool setSocketNonBlocking(int client);
+            bool setSocketNonBlocking(int socket);
             
             bool isValidIP(const std::string &ip);
     };

@@ -117,7 +117,8 @@ namespace vesper {
             void setMiddleware(std::string endpoint, std::string method, bool prefix, std::function<void(HttpConnection &)> handler);
 
         private:
-            std::thread serverThread; // The thread the server/socket uses
+            std::thread serverThread;
+            std::thread asyncThread;
             Tree endpointsTree;
             Tree middlewareTree;
             struct staticFileInfo {
