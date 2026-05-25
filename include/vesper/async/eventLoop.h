@@ -72,7 +72,7 @@ public:
                 if (!h || h.done())
                     continue;
 
-                threads.newTask([h]() mutable {
+                threads.newTask([h]() {
                     h.resume();
                 });
             }

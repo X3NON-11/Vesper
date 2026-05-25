@@ -112,3 +112,16 @@
 14	21159	1779712879384661854	CMakeFiles/vesper-tests.dir/tests/http/radixTree_test.cpp.o	25ab007fa3840f8d
 13	21218	1779712879383416071	CMakeFiles/vesper-tests.dir/tests/http/HttpServer_test.cpp.o	9ebd7dd6964bf423
 21218	21527	1779712900587635756	vesper-tests	41ccefd45504f711
+25	18150	1779713082793206173	CMakeFiles/vesper.dir/src/http/HttpConnection.cpp.o	ebf0ded443cb3f89
+26	18420	1779713082793919521	CMakeFiles/vesper-app.dir/examples/main.cpp.o	da0b0aca103c89a9
+26	18865	1779713082794280600	CMakeFiles/vesper-tests.dir/tests/main.cpp.o	db3e465ff5965bdf
+26	18880	1779713082793662126	CMakeFiles/vesper.dir/src/tcp/TcpServer.cpp.o	6e8171d87e4cb68a
+27	20550	1779713082794610451	CMakeFiles/vesper-tests.dir/tests/tcp/TcpServer_test.cpp.o	d8d27bd2e0439876
+30	20717	1779713082797692504	CMakeFiles/vesper-tests.dir/tests/http/radixTree_test.cpp.o	25ab007fa3840f8d
+32	21000	1779713082799206321	CMakeFiles/vesper-tests.dir/tests/utils/urlEncoding_test.cpp.o	eb4d6d33ec66b91f
+25	21180	1779713082792206149	CMakeFiles/vesper.dir/src/http/HttpServer.cpp.o	52f3fecf6f91e0e7
+21180	21371	1779713103946746834	libvesper.a	3a60135a4562a23c
+21371	21550	1779713104137751892	vesper-app	8bf7947d50286950
+30	22042	1779713082797206272	CMakeFiles/vesper-tests.dir/tests/http/HttpConnection_test.cpp.o	2a21a33a4ae91224
+27	22177	1779713082794898271	CMakeFiles/vesper-tests.dir/tests/http/HttpServer_test.cpp.o	9ebd7dd6964bf423
+22177	22477	1779713104943773254	vesper-tests	41ccefd45504f711
