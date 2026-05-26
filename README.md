@@ -70,13 +70,13 @@ Add this to your CMakeLists
     include(FetchContent)
     
     FetchContent_Declare(
-      vesper
+      Vesper
       GIT_REPOSITORY https://github.com/X3NON-11/Vesper
     )
     
-    FetchContent_MakeAvailable(vesper)
+    FetchContent_MakeAvailable(Vesper)
     
-    target_link_libraries(test PRIVATE vesper::vesper)
+    target_link_libraries(test PRIVATE Vesper::Vesper)
 ```
     
 Or if you want a manually downloaded Version
@@ -84,8 +84,8 @@ Or if you want a manually downloaded Version
 2. Add to CMakeLists like this
 
 ```CMake  
-    add_subdirectory(libs/vesper)    
-    target_link_libraries(test PRIVATE vesper::vesper)
+    add_subdirectory(libs/Vesper)    
+    target_link_libraries(test PRIVATE Vesper::Vesper)
 ```
 
 # Installation - Windows

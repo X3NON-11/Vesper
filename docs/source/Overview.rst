@@ -27,13 +27,13 @@ Installation - Linux
     include(FetchContent)
     
     FetchContent_Declare(
-      vesper
+      Vesper
       GIT_REPOSITORY https://github.com/X3NON-11/Vesper
     )
     
-    FetchContent_MakeAvailable(vesper)
+    FetchContent_MakeAvailable(Vesper)
     
-    target_link_libraries(test PRIVATE vesper::vesper)
+    target_link_libraries(test PRIVATE Vesper::Vesper)
     
 | Or if you want a manually downloaded Version
 | 1. Download zip file from releases
@@ -41,8 +41,8 @@ Installation - Linux
 
 .. code-block:: cmake
     
-    add_subdirectory(libs/vesper)    
-    target_link_libraries(test PRIVATE vesper::vesper)
+    add_subdirectory(libs/Vesper)    
+    target_link_libraries(test PRIVATE Vesper::Vesper)
 
 Installation - Windows
 ======================
