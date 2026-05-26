@@ -1,120 +1,45 @@
-cmake_minimum_required(VERSION 3.21)
-project(vesper LANGUAGES CXX)
+cmake_minimum_required(VERSION 4.0)
+project(Vesper LANGUAGES CXX)
 
-include(FetchContent)
-include(GNUInstallDirs)
-include(CMakePackageConfigHelpers)
+add_library(Vesper SHARED
+    src/http/HttpConnection.cpp
+    src/http/HttpServer.cpp
+    src/http/radixTree.cpp
+    src/tcp/TcpServer.cpp
+    src/utils/threadPool.cpp
+    src/utils/urlEncoding.cpp
+)
+add_library(Vesper::Vesper ALIAS Vesper)
 
-# ============================
-#        Dependencies
-# ============================
+target_compile_features(Vesper PUBLIC cxx_std_20)
 
-option(VESPER_FETCH_DEPS "Fetch dependencies locally" ON)
+target_include_directories(Vesper PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-set(GLAZE_ENABLE_TESTS OFF CACHE BOOL "" FORCE)
-set(GLAZE_ENABLE_BENCHMARKS OFF CACHE BOOL "" FORCE)
-set(GLAZE_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-
-if(VESPER_FETCH_DEPS)
+option(USE_SYSTEM_LIBRARIES "Use system-installed glaze & zlib libraries" OFF)
+if (USE_SYSTEM_LIBRARIES)
+    find_package(glaze REQUIRED)
+    find_package(ZLIB REQUIRED)
+else()
+    include(FetchContent)
+    
     FetchContent_Declare(
-        glaze
-        GIT_REPOSITORY https://github.com/stephenberry/glaze.git
-        GIT_TAG v7.0.2
+      glaze
+      GIT_REPOSITORY https://github.com/stephenberry/glaze.git
+      GIT_TAG main
+      GIT_SHALLOW TRUE
     )
     FetchContent_MakeAvailable(glaze)
-
+    
     FetchContent_Declare(
-        zlib
+        ZLIB
         GIT_REPOSITORY https://github.com/madler/zlib.git
-        GIT_TAG v1.3.2
+        GIT_TAG develop
     )
-    FetchContent_MakeAvailable(zlib)
-
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    FetchContent_Declare(
-        googletest
-        GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG v1.17.0
-    )
-    FetchContent_MakeAvailable(googletest)
-
-else()
-    find_package(ZLIB REQUIRED)
-    find_package(glaze CONFIG REQUIRED)
-    find_package(GTest REQUIRED)
+    FetchContent_MakeAvailable(ZLIB)
+    
 endif()
 
-# ============================
-#          Library
-# ============================
-
-add_library(vesper
-    src/http/HttpServer.cpp
-    src/http/HttpConnection.cpp
-    src/tcp/TcpServer.cpp
-    src/http/radixTree.cpp
-    src/utils/urlEncoding.cpp
-    src/utils/threadPool.cpp
-)
-
-add_library(vesper::vesper ALIAS vesper)
-
-target_include_directories(vesper
-    PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-)
-
-install(DIRECTORY include/
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-)
-
-target_compile_features(vesper PUBLIC cxx_std_20)
-
-target_link_libraries(vesper
-    PUBLIC glaze::glaze
-    PUBLIC ZLIB::ZLIB
-)
-
-install(TARGETS vesper
-    EXPORT vesperTargets
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-)
-
-install(EXPORT vesperTargets
-    FILE vesperTargets.cmake
-    NAMESPACE vesper::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/vesper
-)
-
-# ============================
-# Example Binary (for testing)
-# ============================
-
-add_executable(vesper-app examples/main.cpp)
-
-target_link_libraries(vesper-app
-    PRIVATE vesper::vesper
-    PUBLIC gtest_main
-)
-
-# ============================
-#       Testing binary
-# ============================
-
-add_executable(vesper-tests 
-    tests/main.cpp
-    tests/tcp/TcpServer_test.cpp
-    tests/http/HttpServer_test.cpp
-    tests/http/HttpConnection_test.cpp
-    tests/http/radixTree_test.cpp
-    tests/utils/urlEncoding_test.cpp
-)
-
-target_link_libraries(vesper-tests
-    PRIVATE vesper::vesper
-    PRIVATE gtest_main
+target_link_libraries(Vesper PUBLIC
+    glaze::glaze
+    ZLIB::ZLIB
 )
