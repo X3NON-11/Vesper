@@ -28,7 +28,7 @@ TEST(TcpServer, InvalidIPAddress) {
 TEST(TcpServer, StartServerValid) {
     vesper::TcpServer server;
 
-    int result = server.startServer("127.0.0.1", 0); // 0 lets OS choose port
+    int result = server.startServer("127.0.0.1", 0);
     EXPECT_EQ(result, 0);
 
     server.closeServer();

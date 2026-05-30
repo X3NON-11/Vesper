@@ -3,9 +3,9 @@
 
 using namespace vesper;
 
-//
+// ============
 // HttpResponse
-//
+// ============
 
 TEST(HttpResponse, ConstructorStoresValues) {
     HttpResponse res(HttpResponse::StatusCodes::OK, "hello", "text/plain",
@@ -52,9 +52,9 @@ TEST(HttpResponse, ToHttpStringContainsStatus) {
     EXPECT_NE(http.find("404"), std::string::npos);
 }
 
-//
+// ===========
 // HttpRequest
-//
+// ===========
 
 TEST(HttpRequest, HeaderLookup) {
     HttpRequest req;
@@ -83,9 +83,9 @@ TEST(HttpRequest, ParamLookup) {
     EXPECT_EQ(req.param("id"), "42");
 }
 
-//
+// ==============
 // HttpConnection
-//
+// ==============
 
 TEST(HttpConnection, ConstructConnection) {
     HttpConnection conn(-1, nullptr);
