@@ -35,8 +35,8 @@ int main() {
     server.GET("/cookies", cookies);
     server.GET("/:one/:two/:three", multipleParams);
     server.GET("/error", error);
-    // server.staticFile("/asset", "PicturePath");
-    server.staticDir("/asset", "/home/xenon/Bilder/Wallpaper");
+    // server.staticFile("/asset", "Path");
+    server.staticDir("/asset", "../assets");
 
     vesper::Router group = server.group("/user");
     group.use(testMiddleware);
