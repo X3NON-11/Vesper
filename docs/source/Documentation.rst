@@ -84,3 +84,11 @@ Documentation
     c.setCookie("test", "1234");
     // After reconnecting cookie will be "1234"
     std::string cookie = c.cookies("test");
+
+| **Static Files**  
+| Useful to serve files on specific endpoints. You can do this using the staticDir() and staticFile() command.
+
+.. code-block:: cpp
+
+    server.staticFile("/endpoint", "FilePath");
+    server.staticDir("/endpoint", "FolderPath");
