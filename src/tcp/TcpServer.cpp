@@ -24,7 +24,7 @@ void TcpServer::closeServer() {
 // Sets up a basic Tcp Socket
 int TcpServer::startServer(std::string ipAddress, int port) {
     if (!isValidIP(ipAddress)) {
-        log(LogType::Error, "Invalid Ip Address");
+        log(LogType::CriticalError, "Invalid Ip Address");
         return -1;
     }
 
@@ -44,7 +44,7 @@ int TcpServer::startServer(std::string ipAddress, int port) {
     // Initialize Socket
     listenSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (listenSocket < 0) {
-        log(LogType::Error, "Couldn't initialize socket");
+        log(LogType::CriticalError, "Couldn't initialize socket");
         return -1;
     }
 
@@ -52,7 +52,7 @@ int TcpServer::startServer(std::string ipAddress, int port) {
     int opt = 1; // Enables this option
     if (setsockopt(listenSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) <
         0) {
-        log(LogType::Error, "Couldn't enable option for socket reuse");
+        log(LogType::CriticalError, "Couldn't enable option for socket reuse");
         return -1;
     }
 
@@ -60,13 +60,13 @@ int TcpServer::startServer(std::string ipAddress, int port) {
     int bindStatus = bind(listenSocket, (struct sockaddr *)&server_addr,
                           sizeof(server_addr));
     if (bindStatus < 0) {
-        log(LogType::Error, "Couldn't bind socket to ip-address");
+        log(LogType::CriticalError, "Couldn't bind socket to ip-address");
         return -1;
     }
 
     // Listen on socket
     if (listen(listenSocket, 5) != 0) {
-        log(LogType::Error, "Couldn't listen on socket");
+        log(LogType::CriticalError, "Couldn't listen on socket");
         return -1;
     }
 
@@ -105,12 +105,12 @@ async::Task TcpServer::onClient(int client) {
 bool TcpServer::setSocketNonBlocking(int socket) {
     int flags = fcntl(socket, F_GETFL, 0);
     if (flags == -1) {
-        log(LogType::Warn, "fcntl F_GETFL");
+        log(LogType::Error, "fcntl F_GETFL");
         return false;
     }
 
     if (fcntl(socket, F_SETFL, flags | O_NONBLOCK) == -1) {
-        log(LogType::Warn, "fcntl F_SETFL");
+        log(LogType::Error, "fcntl F_SETFL");
         return false;
     }
 

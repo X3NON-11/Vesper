@@ -59,7 +59,7 @@ async::Task HttpServer::onClient(int client) {
             continue;
 
         case async::RecvResult::Status::Error:
-            log(LogType::Warn, "recv error");
+            log(LogType::Error, "recv error");
             co_return;
         }
 
@@ -75,7 +75,7 @@ async::Task HttpServer::onClient(int client) {
     // https://cplusplus.com/reference/cstdio/sscanf/
     if (sscanf(ctx.request.data(), "%s %s %s", ctx.method, ctx.clientEndpoint,
                ctx.version) != 3) {
-        log(LogType::Warn, "Failed to parse http header");
+        log(LogType::Error, "Failed to parse http header");
         close(client);
         co_return;
     }
@@ -124,7 +124,7 @@ async::Task HttpServer::onClient(int client) {
             continue;
 
         case async::RecvResult::Status::Error:
-            log(LogType::Warn, "recv error");
+            log(LogType::Error, "recv error");
             co_return;
         }
 
@@ -191,8 +191,11 @@ void HttpServer::handleRequest(int client, HttpConnection &connection,
             if (!h.empty()) {
                 h.back()(connection);
                 handled = true;
-            }
-        }
+            } else
+                connection.response.status =
+                    HttpResponse::StatusCodes::NOT_FOUND;
+        } else
+            connection.response.status = HttpResponse::StatusCodes::NOT_FOUND;
     });
 
     if (!handled)
@@ -262,7 +265,7 @@ vesper::Router HttpServer::group(std::string endpoint) {
 void HttpServer::staticDir(std::string endpoint, std::string folder) {
     if (!std::filesystem::exists(folder) ||
         !std::filesystem::is_directory(folder)) {
-        log(LogType::Warn,
+        log(LogType::CriticalError,
             "Directory \"" + folder + "\" doesn't exist or is not a directory");
         return;
     }
@@ -288,13 +291,13 @@ void HttpServer::staticDir(std::string endpoint, std::string folder) {
 
 void HttpServer::staticFile(std::string endpoint, std::string file) {
     if (!std::filesystem::exists(file)) {
-        log(LogType::Warn, "File \"" + file + "\" doesn't exist");
+        log(LogType::CriticalError, "File \"" + file + "\" doesn't exist");
         return;
     }
 
     std::ifstream f(file, std::ios::binary);
     if (!f) {
-        log(LogType::Warn, "Couldn't open file \"" + file + "\"");
+        log(LogType::CriticalError, "Couldn't open file \"" + file + "\"");
         return;
     }
 
@@ -319,7 +322,7 @@ void HttpServer::staticFile(std::string endpoint, std::string file) {
             c.string("");
         }
     };
-    endpointsTree.addURL(endpoint, "GET", false, handler);
+    createEndpoint("GET", endpoint, handler);
 }
 
 std::string HttpServer::getMimeType(std::string file) {
@@ -366,7 +369,7 @@ std::string HttpServer::getMimeType(std::string file) {
 
     size_t dotPos = file.find_last_of('.');
     if (dotPos == std::string::npos || dotPos + 1 >= file.size()) {
-        log(LogType::Warn, "Invalid file");
+        log(LogType::Error, "Invalid file");
         return "application/octet-stream";
     }
 

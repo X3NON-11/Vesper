@@ -55,6 +55,7 @@ void Tree::addURL(std::string url, std::string method, bool prefix,
             // Last segment: set the handler
             current->handlers[method].push_back(handler);
             current->prefix = prefix;
+            current->isEndpoint = true;
             return;
         }
         start = slash + 1;
@@ -91,19 +92,18 @@ Tree::getNodeHandler(std::string url, std::string method) {
 
 bool Tree::matchURL(std::string url, std::string method) {
     if (url == "/") {
-        return root->handlers.find(method) != root->handlers.end();
+        return root->handlers.count(method);
     }
 
-    if (!url.empty() && url[0] == '/') {
+    if (!url.empty() && url[0] == '/')
         url.erase(0, 1);
-    }
 
-    Node *node = matchNode(url, root.get(), 0);
-    if (!node) {
+    Tree::Node *node = matchNode(url, root.get(), 0);
+    if (!node)
         return false;
-    }
 
-    return node->handlers.find(method) != node->handlers.end();
+    auto it = node->handlers.find(method);
+    return it != node->handlers.end();
 }
 
 // Only used for middleware
@@ -223,6 +223,12 @@ void Tree::collectPrefixHandlers(
 
 Tree::Node *Tree::matchNode(std::string &url, Tree::Node *currentNode,
                             int startSlash) {
+    if (!currentNode)
+        return nullptr;
+
+    if (startSlash >= (int)url.size())
+        return currentNode->isEndpoint ? currentNode : nullptr;
+
     int slash = url.find('/', startSlash);
 
     std::string segment = (slash == std::string::npos)
@@ -243,9 +249,8 @@ Tree::Node *Tree::matchNode(std::string &url, Tree::Node *currentNode,
         return nullptr;
     }
 
-    if (slash == std::string::npos) {
-        return nextNode;
-    }
+    if (slash == std::string::npos)
+        return nextNode->isEndpoint ? nextNode : nullptr;
 
     return matchNode(url, nextNode, slash + 1);
 }

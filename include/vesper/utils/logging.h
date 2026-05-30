@@ -17,6 +17,7 @@ inline std::ofstream file;
 inline threadPool logThread(1);
 
 enum class LogType {
+    CriticalError,
     Error,
     Warn,
     Info,
@@ -64,6 +65,17 @@ inline void logOnCurrentThread(LogType type, const std::string& message) {
     std::string color;
 
     switch (type) {
+        case LogType::CriticalError:
+            color = RED;
+            output = "[CRITICAL-ERROR] " + dt + " | " +  message;
+            std::cerr << color << output << RESET << std::endl;
+            if (file.is_open()) {
+                file.flush();
+                file << output << '\n';
+            }
+            if (errorHandler)
+                errorHandler();
+            break;
         case LogType::Error:
             color = RED;
             output = "[ERROR] " + dt + " | " +  message;
@@ -72,8 +84,6 @@ inline void logOnCurrentThread(LogType type, const std::string& message) {
                 file.flush();
                 file << output << '\n';
             }
-            if (errorHandler)
-                errorHandler();
             break;
         case LogType::Warn:
             if (ignoreWarnings) return;

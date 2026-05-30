@@ -36,7 +36,7 @@ int main() {
     server.GET("/:one/:two/:three", multipleParams);
     server.GET("/error", error);
     // server.staticFile("/asset", "PicturePath");
-    // server.staticDir("/asset", "PicturesPath");
+    server.staticDir("/asset", "/home/xenon/Bilder/Wallpaper");
 
     vesper::Router group = server.group("/user");
     group.use(testMiddleware);
@@ -136,6 +136,6 @@ void multipleParams(vesper::HttpConnection &c) {
 }
 
 void error(vesper::HttpConnection &c) {
-    throw std::runtime_error("This is a error");
+    throw std::runtime_error("This is an error");
     c.string("Shouldnt get sent");
 }

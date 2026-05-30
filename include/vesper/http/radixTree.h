@@ -21,6 +21,7 @@ class Tree {
             std::unique_ptr<Node> paramChild = nullptr;
             std::string paramName;
             bool prefix = false;
+            bool isEndpoint = false;
         };
         std::unique_ptr<Node> root;
         

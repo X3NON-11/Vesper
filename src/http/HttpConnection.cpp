@@ -112,7 +112,7 @@ HttpConnection::HttpConnection(int client, vesper::HttpServer *server)
 void HttpConnection::sendErrorNoHandler() {
     string(HttpResponse::StatusCodes::INTERNAL_SERVER_ERROR,
            "No handler parsed");
-    log(LogType::Warn, "No handler parsed");
+    log(LogType::Error, "No handler parsed");
 }
 
 void HttpConnection::string(int status, std::string body) {
