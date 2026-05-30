@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg"
-     viewBox="5750 5138 9251 4863"
-     width="100%"
-     height="100%"
-     preserveAspectRatio="xMidYMid meet">
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 
+<svg xmlns="http://www.w3.org/2000/svg">
   <style>
     .dark { display: none; }
 
@@ -15,71 +13,140 @@
   </style>
 
   <g class="dark">
+    <svg version="1.2"
+         viewBox="5750 5138 9251 4863"
+         preserveAspectRatio="xMidYMid"
+         fill-rule="evenodd"
+         stroke-width="28.222"
+         stroke-linejoin="round"
+         xmlns="http://www.w3.org/2000/svg"
+         xmlns:ooo="http://xml.openoffice.org/svg/export"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:presentation="http://sun.com/xmlns/staroffice/presentation"
+         xmlns:smil="http://www.w3.org/2001/SMIL20/"
+         xmlns:anim="urn:oasis:names:tc:opendocument:xmlns:animation:1.0"
+         xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
+         xml:space="preserve">
 
-    <g class="TextShape">
-      <g id="id3">
-        <rect x="5750" y="5138" width="2751" height="4863" fill="none"/>
-        <text x="6080" y="8883"
-              font-family="Noto Sans Black, sans-serif"
-              font-size="3387"
-              font-style="italic"
-              fill="rgb(129,212,26)">
-          V
-        </text>
+      <defs>
+        <font id="EmbeddedFont_1" horiz-adv-x="2048">
+          <font-face font-family="Noto Sans Black embedded"
+                     units-per-em="2048"
+                     font-weight="normal"
+                     font-style="normal"
+                     ascent="2170"
+                     descent="609"/>
+          <missing-glyph horiz-adv-x="2048"
+                         d="M 0,0 L 2047,0 2047,2047 0,2047 0,0 Z"/>
+        </font>
+      </defs>
+
+      <defs>
+        <font id="EmbeddedFont_2" horiz-adv-x="2048">
+          <font-face font-family="Noto Sans Black embedded"
+                     units-per-em="2048"
+                     font-weight="normal"
+                     font-style="italic"
+                     ascent="2170"
+                     descent="609"/>
+          <missing-glyph horiz-adv-x="2048"
+                         d="M 0,0 L 2047,0 2047,2047 0,2047 0,0 Z"/>
+        </font>
+      </defs>
+
+      <defs class="EmbeddedBulletChars">
+        <g id="bullet-char-template-57356"
+           transform="scale(0.00048828125,-0.00048828125)">
+          <path d="M 580,1141 L 1163,571 580,0 -4,571 580,1141 Z"/>
+        </g>
+        <g id="bullet-char-template-57354"
+           transform="scale(0.00048828125,-0.00048828125)">
+          <path d="M 8,1128 L 1137,1128 1137,0 8,0 8,1128 Z"/>
+        </g>
+        <g id="bullet-char-template-10146"
+           transform="scale(0.00048828125,-0.00048828125)">
+          <path d="M 174,0 L 602,739 174,1481 1456,739 174,0 Z"/>
+        </g>
+      </defs>
+
+      <g class="Page">
+
+        <g class="TextShape" id="id3">
+          <rect x="5750" y="5138" width="2751" height="4863" fill="none"/>
+          <text x="6080" y="8883"
+                font-family="Noto Sans Black, sans-serif"
+                font-size="3387"
+                font-style="italic"
+                fill="rgb(129,212,26)">
+            V
+          </text>
+        </g>
+
+        <g class="TextShape" id="id4">
+          <rect x="7750" y="5750" width="7251" height="3423" fill="none"/>
+          <text x="8000" y="8364"
+                font-family="Noto Sans Black, sans-serif"
+                font-size="2328"
+                fill="rgb(0,0,0)">
+            esper
+          </text>
+        </g>
+
+        <g class="com.sun.star.drawing.CustomShape" id="id5">
+          <rect x="6500" y="9250" width="4001" height="751" fill="rgb(0,0,0)"/>
+        </g>
+
+        <g class="com.sun.star.drawing.CustomShape" id="id6">
+          <rect x="11500" y="9250" width="3001" height="751" fill="rgb(0,0,0)"/>
+        </g>
+
       </g>
-    </g>
-
-    <g class="TextShape">
-      <g id="id4">
-        <rect x="7750" y="5750" width="7251" height="3423" fill="none"/>
-        <text x="8000" y="8364"
-              font-family="Noto Sans Black, sans-serif"
-              font-size="2328"
-              fill="rgb(250,250,250)">
-          esper
-        </text>
-      </g>
-    </g>
-
-    <g class="shape">
-      <rect x="6500" y="9250" width="4001" height="750" fill="rgb(250,250,250)"/>
-      <rect x="11500" y="9250" width="3000" height="750" fill="rgb(250,250,250)"/>
-    </g>
-
+    </svg>
   </g>
 
   <g class="light">
+    <svg version="1.2"
+         viewBox="5750 5138 9251 4863"
+         preserveAspectRatio="xMidYMid"
+         fill-rule="evenodd"
+         stroke-width="28.222"
+         stroke-linejoin="round"
+         xmlns="http://www.w3.org/2000/svg"
+         xml:space="preserve">
 
-    <g class="TextShape">
-      <g id="id3">
-        <rect x="5750" y="5138" width="2751" height="4863" fill="none"/>
-        <text x="6080" y="8883"
-              font-family="Noto Sans Black, sans-serif"
-              font-size="3387"
-              font-style="italic"
-              fill="rgb(129,212,26)">
-          V
-        </text>
+      <g class="Page">
+
+        <g class="TextShape" id="id3">
+          <rect x="5750" y="5138" width="2751" height="4863" fill="none"/>
+          <text x="6080" y="8883"
+                font-family="Noto Sans Black, sans-serif"
+                font-size="3387"
+                font-style="italic"
+                fill="rgb(129,212,26)">
+            V
+          </text>
+        </g>
+
+        <g class="TextShape" id="id4">
+          <rect x="7750" y="5750" width="7251" height="3423" fill="none"/>
+          <text x="8000" y="8364"
+                font-family="Noto Sans Black, sans-serif"
+                font-size="2328"
+                fill="rgb(250,250,250)">
+            esper
+          </text>
+        </g>
+
+        <g class="com.sun.star.drawing.CustomShape" id="id5">
+          <rect x="6500" y="9250" width="4001" height="751" fill="rgb(250,250,250)"/>
+        </g>
+
+        <g class="com.sun.star.drawing.CustomShape" id="id6">
+          <rect x="11500" y="9250" width="3001" height="751" fill="rgb(250,250,250)"/>
+        </g>
+
       </g>
-    </g>
-
-    <g class="TextShape">
-      <g id="id4">
-        <rect x="7750" y="5750" width="7251" height="3423" fill="none"/>
-        <text x="8000" y="8364"
-              font-family="Noto Sans Black, sans-serif"
-              font-size="2328"
-              fill="rgb(0,0,0)">
-          esper
-        </text>
-      </g>
-    </g>
-
-    <g class="shape">
-      <rect x="6500" y="9250" width="4001" height="750" fill="rgb(0,0,0)"/>
-      <rect x="11500" y="9250" width="3000" height="750" fill="rgb(0,0,0)"/>
-    </g>
+    </svg>
 
   </g>
-
 </svg>
