@@ -93,9 +93,9 @@ We currently don't have native Windows support, but you can use the docker folde
 as a starting point for your project, so it can run cross plattform
 
 # Documentation
-**Important**
+**Important**  
 For further documentation download the repository and open the sphinx documentation 
-under the build folder (e.g. on Linux then run ./docs.sh)
+under the build folder (e.g. on Linux then run ./docs.sh)  
 **Create Endpoints**  
 Use the functions GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD on the server object to create a new Endpoint.
 ```C++
@@ -139,25 +139,27 @@ Useful for Auth Headers etc. Can be use with the getHeader() function which take
 ```C++
 std::string message = c.getHeader("message");
 ```
-
 **Router Grous**  
 Useful when you want to set a middleware for all endpoints beneath another. When for example given the endpoint /test it lets you set middleware for all endpoints beneath using g.use(middleware) or create new endpoints with g.GET("/example", handler) leading to the creation of the endpoint /test/example
 ```C++
 vesper::Router g = server.group("/test");
-
 ```
-
 **Redirects**  
 Can be for example used when autherization failed and you want to send the user to the home page. Then you can use c.redirect("/") to redirect him
 ```C++
 c.redirect("/");
 ```
-
-**Cookies**
+**Cookies**  
 Useful when making a website that requires authentication. Then you can using setCookie() set a header which with every request gets sent from the browser,
 enabiling you to retrieve that data using the cookies() function.
 ```C++
 c.setCookie("test", "1234");
 // After reconnecting cookie will be "1234"
 std::string cookie = c.cookies("test");
+```
+**Static Files**  
+Useful to serve files on specific endpoints. You can do this using the staticDir() and staticFile() command.
+```C++
+server.staticFile("/endpoint", "FilePath");
+server.staticDir("/endpoint", "FolderPath");
 ```
