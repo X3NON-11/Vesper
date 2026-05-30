@@ -2,7 +2,12 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="5750 5138 9251 4863" width="100%" height="100%">
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="5750 5138 9251 4863"
+  width="800"
+  height="420"
+  preserveAspectRatio="xMidYMid meet">
   <style>
     .dark { display: none; }
 
