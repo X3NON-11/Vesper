@@ -1,18 +1,8 @@
 <div align="center">
   
-<picture>
-  <source
-    media="(prefers-color-scheme: dark)"
-    srcset="/assets/VesperLogo-DarkMode.svg">
-
-  <source
-    media="(prefers-color-scheme: light)"
-    srcset="/assets/VesperLogo-WhiteMode.svg">
-
   <img
-    src="/assets/VesperLogo-WhiteMode.svg"
+    src="/assets/VesperLogo.svg"
     alt="Logo">
-</picture>
 
  *A Gin inspired http server library for C++*
 </div>
