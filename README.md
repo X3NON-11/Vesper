@@ -1,8 +1,6 @@
 <div align="center">
   
-  <img
-    src="/assets/VesperLogo.svg"
-    alt="Logo">
+  <img src="VesperLogo.svg" style="width:200px; height:auto;">
 
  *A Gin inspired http server library for C++*
 </div>
