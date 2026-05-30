@@ -120,3 +120,16 @@
 2438	24004	1779786469886520865	CMakeFiles/Vesper-tests.dir/tests/http/radixTree_test.cpp.o	79cf765d172c3634
 6694	25094	1779786474142531053	CMakeFiles/Vesper-tests.dir/tests/utils/urlEncoding_test.cpp.o	afed1c8def3f1945
 25095	25360	1779786492543575104	Vesper-tests	497a694079f120dc
+30	1111	1780143009345304831	CMakeFiles/Vesper-tests.dir/tests/http/HttpConnection_test.cpp.o.ddi	e340faf7f9db164a
+31	1112	1780143009346304826	CMakeFiles/Vesper-tests.dir/tests/tcp/TcpServer_test.cpp.o.ddi	5927c8ea1495095f
+1112	1138	1780143010427299380	CMakeFiles/Vesper-tests.dir/CXX.dd	47b40834a89d543
+1112	1138	1780143010427299380	CMakeFiles/Vesper-tests.dir/CXXModules.json	47b40834a89d543
+1112	1138	1780143010427299380	CMakeFiles/Vesper-tests.dir/tests/main.cpp.o.modmap	47b40834a89d543
+1112	1138	1780143010427299380	CMakeFiles/Vesper-tests.dir/tests/http/HttpConnection_test.cpp.o.modmap	47b40834a89d543
+1112	1138	1780143010427299380	CMakeFiles/Vesper-tests.dir/tests/http/HttpServer_test.cpp.o.modmap	47b40834a89d543
+1112	1138	1780143010427299380	CMakeFiles/Vesper-tests.dir/tests/http/radixTree_test.cpp.o.modmap	47b40834a89d543
+1112	1138	1780143010427299380	CMakeFiles/Vesper-tests.dir/tests/tcp/TcpServer_test.cpp.o.modmap	47b40834a89d543
+1112	1138	1780143010427299380	CMakeFiles/Vesper-tests.dir/tests/utils/urlEncoding_test.cpp.o.modmap	47b40834a89d543
+1139	11601	1780143010455240484	CMakeFiles/Vesper-tests.dir/tests/tcp/TcpServer_test.cpp.o	e4ace24ded18e778
+1139	12101	1780143010454875288	CMakeFiles/Vesper-tests.dir/tests/http/HttpConnection_test.cpp.o	da94a1e3c465464b
+12101	12428	1780143021416247917	Vesper-tests	497a694079f120dc

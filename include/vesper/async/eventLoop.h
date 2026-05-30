@@ -34,11 +34,11 @@ public:
             if (errno == EEXIST) {
                 if (epoll_ctl(epollFD, EPOLL_CTL_MOD, fd, &ev) == -1) {
                     delete ptr;
-                    log(LogType::Error, "epoll_ctl MOD failed");
+                    log(LogType::Warn, "epoll_ctl MOD failed");
                 }
             } else {
                 delete ptr;
-                log(LogType::Error, "epoll_ctl ADD failed");
+                log(LogType::Warn, "epoll_ctl ADD failed");
             }
         }
     }
@@ -54,7 +54,7 @@ public:
                 if (errno == EINTR)
                     continue;
 
-                log(LogType::Error, "epoll_wait failed");
+                log(LogType::Warn, "epoll_wait failed");
                 continue;
             }
 
