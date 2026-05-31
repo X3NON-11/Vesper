@@ -72,6 +72,7 @@ Add this to your CMakeLists
     FetchContent_Declare(
       Vesper
       GIT_REPOSITORY https://github.com/X3NON-11/Vesper
+      GIT_TAG main
     )
     
     FetchContent_MakeAvailable(Vesper)
